@@ -23,5 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 .env
+git checkout --orphan clean-branch
+git checkout --orphan clean-branch
 
 
