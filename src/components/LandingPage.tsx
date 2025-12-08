@@ -90,7 +90,7 @@ const LandingPage: React.FC = () => {
             </div>
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
               Your Journey to a
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-blue-600"> Healthier You</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-blue-600"> PersonalHealth AI</span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
               Transform your lifestyle with personalized nutrition and fitness plans. 

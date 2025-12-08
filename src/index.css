@@ -1,3 +1,58 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply text-gray-800 antialiased bg-gray-50;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+}
+
+/* Background Modern: Diagonal Stripes (Garis Miring) */
+.textured-bg {
+  background-color: #f8fafc; /* Warna dasar lembut */
+  background-image: repeating-linear-gradient(
+    45deg,
+    #cbd5e1 0px,
+    #cbd5e1 1px,
+    transparent 1px,
+    transparent 30px
+  );
+  background-size: 100% 100%;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Glassmorphism Utility */
+.glass-panel {
+  @apply bg-white/60 backdrop-blur-md border border-white/60 shadow-lg rounded-3xl transition-all duration-300;
+}
+
+.glass-card {
+  @apply bg-white/80 backdrop-blur-sm border border-white/50 shadow-sm rounded-2xl hover:shadow-md transition-all duration-300 hover:-translate-y-1;
+}
+
+/* Animasi Floating Emoji */
+@keyframes float-emoji {
+  0% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(5deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+.floating-emoji {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  animation: float-emoji 8s ease-in-out infinite;
+  opacity: 0.15; /* Transparan agar tidak mengganggu */
+  filter: grayscale(100%);
+  transition: all 0.5s ease;
+}
+
+.floating-emoji:hover {
+  filter: grayscale(0%);
+  opacity: 1;
+  transform: scale(1.1);
+}
