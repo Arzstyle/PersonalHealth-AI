@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import Lottie from "lottie-react";
 import { generateAIContent } from "../services/ai";
 
-const API_KEY =
-  "sk-ai-v1-9b40b3d621ec2e57b142749f38d10726e04b603ca0fa29c96acabdd1777e99fb";
 import {
   Dumbbell,
   Home,
@@ -15,13 +13,9 @@ import {
   Repeat,
   Zap,
   Trophy,
-  BicepsFlexed,
-  Footprints,
   HeartPulse,
   Sparkles,
   PenTool,
-  MoreHorizontal,
-  Plus,
 } from "lucide-react";
 
 import burpeeAnim from "../animations/Burpee.json";
