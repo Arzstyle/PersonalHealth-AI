@@ -17,6 +17,16 @@ import {
   PenTool,
   CheckCircle,
   Circle,
+  Egg,
+  Fish,
+  Carrot,
+  Beef,
+  Sandwich,
+  Apple,
+  Cookie,
+  Drumstick,
+  Soup,
+  GlassWater,
 } from "lucide-react";
 import { generateAIContent } from "../services/ai";
 import nutritionData from "../data/nutrition.json";
@@ -31,7 +41,6 @@ interface Meal {
   protein: number;
   carbs: number;
   fat: number;
-  image: string;
   completed?: boolean;
 }
 
@@ -162,74 +171,124 @@ const MealPlanning: React.FC = () => {
       const isMale = user ? user.gender === "male" : true;
       const weight = user ? user.weight : 60;
 
+      // --- HITUNG KEBUTUHAN KALORI PERSONAL (Mifflin-St Jeor) ---
+      let dailyCaloriesNeed = 2000; // Default fallback
+
+      if (user) {
+        // 1. Hitung BMR
+        const weight = parseFloat(user.weight);
+        const height = parseFloat(user.height);
+        const age = parseInt(user.age);
+
+        let bmr = 0;
+        if (user.gender === "male") {
+          bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+        } else {
+          bmr = 10 * weight + 6.25 * height - 5 * age - 161;
+        }
+
+        // 2. Hitung TDEE (Total Daily Energy Expenditure)
+        // Asumsi aktivitas 'Moderate' (x1.35) karena user aplikasi kesehatan biasanya olahraga
+        // Jika ada data activity level di user, bisa diganti dinamis.
+        const activityMultiplier =
+          user.activityLevel === "active" ? 1.55 : 1.35;
+        dailyCaloriesNeed = Math.round(bmr * activityMultiplier);
+      }
+
+      // --- TENTUKAN TARGET BERDASARKAN GOAL ---
+      let minCal = 0;
+      let maxCal = 0;
+
       if (dietGoal === "low-cal") {
-        const minCal = isMale ? 1500 : 1200;
-        const maxCal = isMale ? 1900 : 1600;
+        // Cutting
+        // Updated: Range random 1200 - 1600
+        minCal = 1200;
+        maxCal = 1600;
+
         const minProt = Math.round(weight * 1.6);
         const maxProt = Math.round(weight * 2.2);
 
-        // Low Cal Specifics: Min Carbs 30-100g, Max Fat 25-40g
-        targetInfo = `TARGET: Kalori ${minCal}-${maxCal} kcal. Protein ${minProt}-${maxProt}g. Karbo 30-100g. Lemak MAX 25-40g.`;
-        dietInstruction = `Tujuan: CLEAN EATING (Cutting/Defisit). ${targetInfo}
-           - Protein TINGGI, Lemak RENDAH, Karbo RENDAH.
-           - Bahan: Dada ayam, ikan putih, putih telur, tahu/tempe, sayuran hijau.
-           - Masak: Rebus, Kukus, Pepes, Bakar (tanpa minyak/sedikit). HINDARI GORENGAN & SANTAN KENTAL.`;
+        targetInfo = `TARGET HARIAN: Kalori ${minCal}-${maxCal} kcal. Protein ${minProt}-${maxProt}g.`;
+        dietInstruction = `Tujuan: CLEAN EATING (Cutting/Defisit).
+           - ATURAN UTAMA: Capai target kalori harian yang diminta.
+           - Protein 1.6–2.2 g/kg BB.
+           - Karbohidrat 30–100g. Lemak 30-50g.
+           - Bahan: Dada ayam, ikan, telur, tahu/tempe, sayuran.`;
       } else if (dietGoal === "bulking") {
-        const minCal = isMale ? 2600 : 2100;
-        const maxCal = isMale ? 3200 : 2600;
-        const minProt = Math.round(weight * 1.4);
-        const maxProt = Math.round(weight * 1.8);
+        // Bulking
+        const target = dailyCaloriesNeed + 400;
+        minCal = target;
+        maxCal = target + 500;
 
-        // Bulking Specifics: Min Carbs 200-300g, Max Fat 70-90g
-        targetInfo = `TARGET: Kalori ${minCal}-${maxCal} kcal. Protein ${minProt}-${maxProt}g. Karbo 200-300g. Lemak MAX 70-90g.`;
-        dietInstruction = `Tujuan: BULKING (Surplus Otot). ${targetInfo}
-           - Protein dan Karbohidrat kompleks TINGGI untuk energi latihan.
-           - Lemak sedang (jangan berlebihan).
-           - Sertakan nasi, ubi, kentang, daging, kacang-kacangan.`;
+        const minProt = Math.round(weight * 1.6);
+        const maxProt = Math.round(weight * 2.0);
+
+        targetInfo = `TARGET HARIAN: Kalori ${minCal}-${maxCal} kcal. Protein ${minProt}-${maxProt}g.`;
+        dietInstruction = `Tujuan: BULKING (Surplus Otot).
+           - Kalori Total WAJIB TINGGI (${minCal}+).
+           - Karbohidrat & Protein TINGGI.
+           - Porsi BESAR.`;
       } else {
-        // Standard / Maintain
-        const minCal = isMale ? 2200 : 1800;
-        const maxCal = isMale ? 2600 : 2200;
-        const minProt = Math.round(weight * 0.8);
-        const maxProt = Math.round(weight * 1.2);
+        // Maintenance
+        minCal = dailyCaloriesNeed - 200;
+        maxCal = dailyCaloriesNeed + 200;
 
-        // Standard Specifics: Carbs 150-200g, Max Fat 60-80g
-        targetInfo = `TARGET: Kalori ${minCal}-${maxCal} kcal. Protein ${minProt}-${maxProt}g. Karbo 150-200g. Lemak MAX 60-80g.`;
-        dietInstruction = `Tujuan: STANDARD / MAINTAIN (Seimbang). ${targetInfo}
-           - Gizi seimbang (Karbo cukup untuk otak, Lemak cukup untuk hormon).
-           - Menu masakan rumahan Indonesia yang sehat.`;
+        targetInfo = `TARGET HARIAN: Kalori ${minCal}-${maxCal} kcal.`;
+        dietInstruction = `Tujuan: MAINTENANCE (Seimbang).
+           - Gizi seimbang. Porsi normal rumahan.`;
       }
+
+      // --- HITUNG RANDOm TARGET (Agar bervariasi) ---
+      // Pick a random number between minCal and maxCal
+      const randomTarget =
+        Math.floor(Math.random() * (maxCal - minCal + 1)) + minCal;
+
+      // --- BREAKDOWN MEAL TARGETS (Based on RANDOM Target) ---
+      // Pembagian: Breakfast 25%, Lunch 35%, Dinner 25%, Snack 15%
+      const bfTarget = Math.round(randomTarget * 0.25);
+      const lnTarget = Math.round(randomTarget * 0.35);
+      const dnTarget = Math.round(randomTarget * 0.25);
+      const snTarget = Math.round(randomTarget * 0.15);
+
+      const mealTargets = `
+      - BREAKFAST: ~${bfTarget} kcal
+      - LUNCH: ~${lnTarget} kcal
+      - DINNER: ~${dnTarget} kcal
+      - SNACKS: ~${snTarget} kcal
+      (TARGET TOTAL HARUS DEKAT: ${randomTarget} kcal)
+      `;
 
       const userProfile = user
         ? `Profil: ${isMale ? "Laki-laki" : "Perempuan"}, ${
             user.age
-          } th, ${weight}kg, ${user.height}cm`
+          } th, ${weight}kg, ${user.height}cm. BMR est: ${Math.round(
+            dailyCaloriesNeed / 1.35
+          )}.`
         : "";
 
-      const prompt = `Buatkan rencana makan 1 hari (breakfast, lunch, dinner, snacks) KHUSUS MASAKAN INDONESIA untuk:
+      const prompt = `Buatkan rencana makan 1 hari KHUSUS MASAKAN INDONESIA yang enak tapi sehat. 
       ${userProfile}
-      ${targetInfo} (USAHAKAN MENDEKATI RANGE INI)
+      ${targetInfo}
       
-      DATABASE REFERENSI (TIDAK WAJIB PERSIS, BOLEH KREASI):
-      ${nutritionList}
-      
-      ATURAN: 
-      1. NAMA: Gunakan nama yang ENAK DIBACA, POPULER, dan PENDEK (Contoh: "Pepes Ikan", "Ayam Bakar").
-      2. DATA: Gunakan angka nutrisi dari database jika ada. Jika tidak, ESTIMASI SENDIRI secara logis.
-      3. FORMAT DATA: JSON valid. Jangan pakai markdown code block/backticks.
+      PANDUAN KALORI PER MAKAN (Ikuti ini agar target tercapai):
+      ${mealTargets}
       
       ${dietInstruction}
       
-      3. ICON (PENTING): Wajib gunakan emoji yang SANGAT SPESIFIK menggambarkan makanannya.
-      4. PORSI/DETAIL: Wajib berikan keterangan porsi/gramasi/jumlah di field terpisah.
-
-      Output harus format JSON valid tanpa markdown, dengan struktur:
+      DATABASE REFERENSI:
+      ${nutritionList}
+      
+      ATURAN FORMAT:
+      1. NAMA MENU: Populer & Enak (e.g., "Ayam Pop", "Pepes Ikan", "Sayur Asem").
+      2. PORSI: Tulis gramasi JELAS. Jika kalori kurang, perbesar gramasinya!
+      3. OUTPUT: JSON valid struktur fix (breakfast, lunch, dinner, snacks).
+      
+      JSON Only:
       {
-        "breakfast": [{ "id": 101, "name": "Ayam Goreng (Dada)", "portion": "1 potong besar (150g)", "calories": 0, "protein": 0, "carbs": 0, "fat": 0, "image": "🍗" }],
-        "lunch": [...],
-        "dinner": [...],
+        "breakfast": [{ "id": 1, "name": "...", "portion": "...", "calories": ${bfTarget}, "protein": 20, "carbs": 10, "fat": 5 }],
+        "lunch": [{ "id": 2, "name": "...", "portion": "...", "calories": ${lnTarget}, "protein": 30, "carbs": 40, "fat": 10 }],
+        "dinner": [...], 
         "snacks": [...]
-      }
       }`;
 
       const result = await generateAIContent(prompt);
@@ -238,7 +297,20 @@ const MealPlanning: React.FC = () => {
         throw new Error(result.error);
       }
 
-      const data = JSON.parse(result.data);
+      let cleanData = result.data
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .trim();
+
+      // Attempt to find the first '{' and last '}' to handle potential extra text
+      const firstBrace = cleanData.indexOf("{");
+      const lastBrace = cleanData.lastIndexOf("}");
+
+      if (firstBrace !== -1 && lastBrace !== -1) {
+        cleanData = cleanData.substring(firstBrace, lastBrace + 1);
+      }
+
+      const data = JSON.parse(cleanData);
       // Ensure completion status is false for new meals
       const initializedData = Object.keys(data).reduce((acc, key) => {
         // @ts-ignore
@@ -273,6 +345,90 @@ const MealPlanning: React.FC = () => {
       });
       return { ...prev, [mealType]: updatedCategory };
     });
+  };
+
+  const getFoodVisuals = (name: string, defaultStyle: any) => {
+    const n = name.toLowerCase();
+
+    // Proteins
+    if (n.includes("telur") || n.includes("egg"))
+      return { icon: Egg, color: "text-amber-500", bg: "bg-amber-100" };
+    if (
+      n.includes("ikan") ||
+      n.includes("fish") ||
+      n.includes("lele") ||
+      n.includes("gurame")
+    )
+      return { icon: Fish, color: "text-blue-500", bg: "bg-blue-100" };
+    if (
+      n.includes("ayam") ||
+      n.includes("chicken") ||
+      n.includes("bebek") ||
+      n.includes("drumstick")
+    )
+      return { icon: Drumstick, color: "text-orange-600", bg: "bg-orange-100" };
+    if (
+      n.includes("daging") ||
+      n.includes("sapi") ||
+      n.includes("beef") ||
+      n.includes("burger")
+    )
+      return { icon: Beef, color: "text-red-600", bg: "bg-red-100" };
+
+    // Veggies
+    if (
+      n.includes("sayur") ||
+      n.includes("salad") ||
+      n.includes("brokoli") ||
+      n.includes("bayam") ||
+      n.includes("pecel") ||
+      n.includes("gado")
+    )
+      return { icon: Carrot, color: "text-green-600", bg: "bg-green-100" };
+
+    // Carbs
+    if (n.includes("roti") || n.includes("bread") || n.includes("sandwich"))
+      return { icon: Sandwich, color: "text-amber-700", bg: "bg-amber-100" };
+    if (n.includes("nasi") || n.includes("rice") || n.includes("bubur"))
+      return { icon: Utensils, color: "text-zinc-600", bg: "bg-zinc-100" };
+    if (n.includes("mie") || n.includes("pasta") || n.includes("spaghetti"))
+      return { icon: Utensils, color: "text-yellow-600", bg: "bg-yellow-100" };
+
+    // Drinks / Dairy
+    if (n.includes("susu") || n.includes("milk") || n.includes("yogurt"))
+      return { icon: GlassWater, color: "text-sky-500", bg: "bg-sky-100" };
+    if (n.includes("kopi") || n.includes("teh"))
+      return { icon: Coffee, color: "text-amber-800", bg: "bg-amber-100" };
+
+    // Fruits
+    if (
+      n.includes("buah") ||
+      n.includes("fruit") ||
+      n.includes("apel") ||
+      n.includes("pisang") ||
+      n.includes("mangga") ||
+      n.includes("jeruk")
+    )
+      return { icon: Apple, color: "text-rose-500", bg: "bg-rose-100" };
+
+    // Others
+    if (n.includes("soto") || n.includes("sop") || n.includes("sup"))
+      return { icon: Soup, color: "text-yellow-500", bg: "bg-yellow-100" };
+    if (
+      n.includes("gorengan") ||
+      n.includes("bakwan") ||
+      n.includes("tahu") ||
+      n.includes("tempe") ||
+      n.includes("keripik")
+    )
+      return { icon: Cookie, color: "text-orange-400", bg: "bg-orange-50" };
+
+    // Default fallback to category style but remove specific category specific styling if needed or keep consistent
+    return {
+      icon: defaultStyle.icon,
+      color: "text-gray-500", // Default Neutral
+      bg: "bg-gray-100",
+    };
   };
 
   const getCategoryStyle = (type: string) => {
@@ -573,7 +729,7 @@ const MealPlanning: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {["breakfast", "lunch", "dinner", "snacks"].map((mealType) => {
           const style = getCategoryStyle(mealType);
-          const Icon = style.icon;
+          const CategoryIcon = style.icon;
           // @ts-ignore
           const meals = mealsData[mealType];
           // @ts-ignore
@@ -593,7 +749,7 @@ const MealPlanning: React.FC = () => {
                   <div
                     className={`p-3 rounded-2xl ${style.bg} ${style.color} shadow-sm`}
                   >
-                    <Icon className="w-6 h-6" />
+                    <CategoryIcon className="w-6 h-6" />
                   </div>
                   <div>
                     <h3 className="font-bold text-xl text-gray-800">
@@ -647,11 +803,37 @@ const MealPlanning: React.FC = () => {
                         </button>
 
                         <div
-                          className={`text-2xl bg-white w-12 h-12 flex items-center justify-center rounded-xl shadow-sm transition-opacity ${
-                            food.completed ? "grayscale opacity-70" : ""
+                          className={`w-12 h-12 flex items-center justify-center rounded-xl shadow-sm transition-opacity ${
+                            food.completed
+                              ? "grayscale opacity-70 bg-gray-100"
+                              : ""
+                          } ${
+                            !food.completed
+                              ? (() => {
+                                  // Only apply color bg if not completed
+                                  const visuals = getFoodVisuals(
+                                    food.name,
+                                    style
+                                  );
+                                  return visuals.bg;
+                                })()
+                              : ""
                           }`}
                         >
-                          {food.image}
+                          {(() => {
+                            const visuals = getFoodVisuals(food.name, style);
+                            const FoodIcon = visuals.icon;
+                            // Apply custom color if active, gray if completed
+                            return (
+                              <FoodIcon
+                                className={`w-6 h-6 ${
+                                  food.completed
+                                    ? "text-gray-500"
+                                    : visuals.color
+                                }`}
+                              />
+                            );
+                          })()}
                         </div>
                         <div
                           className={`${
