@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Mail,
@@ -7,7 +7,7 @@ import {
   ShieldCheck,
   AlertCircle,
   CheckCircle,
-  Loader2,
+  Activity,
   Ghost,
 } from "lucide-react";
 import {
@@ -22,17 +22,27 @@ import {
 } from "firebase/auth";
 import { useUI } from "../context/UIContext";
 
-// --- BACKGROUND DIGITAL GRID ---
-const DigitalGridBackground = () => (
-  <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-[#050b14] transition-colors duration-500">
-    <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px]"></div>
-    <div className="absolute inset-0 bg-gradient-to-t from-[#050b14] via-transparent to-[#050b14]"></div>
-    <div className="absolute top-[-20%] left-[-20%] w-[600px] h-[600px] bg-primary-500/10 rounded-full blur-[150px] mix-blend-screen animate-pulse"></div>
-    <div
-      className="absolute bottom-[-20%] right-[-20%] w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[150px] mix-blend-screen animate-pulse"
-      style={{ animationDelay: "2s" }}
-    ></div>
-  </div>
+// --- ADAPTIVE BACKGROUND ---
+const AdaptiveBackground = () => (
+  <>
+    {/* Light Mode: Pastel Blobs & Subtle Grid */}
+    <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-100 dark:opacity-0 transition-opacity duration-700">
+      <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-blue-200/40 rounded-full blur-[120px] mix-blend-multiply"></div>
+      <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-purple-200/40 rounded-full blur-[120px] mix-blend-multiply"></div>
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+    </div>
+
+    {/* Dark Mode: Digital Grid & Neon */}
+    <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-0 dark:opacity-100 transition-opacity duration-700 bg-[#050b14]">
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-[#050b14] via-transparent to-[#050b14]"></div>
+      <div className="absolute top-[-20%] left-[-20%] w-[600px] h-[600px] bg-primary-500/10 rounded-full blur-[150px] mix-blend-screen animate-pulse"></div>
+      <div
+        className="absolute bottom-[-20%] right-[-20%] w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[150px] mix-blend-screen animate-pulse"
+        style={{ animationDelay: "2s" }}
+      ></div>
+    </div>
+  </>
 );
 
 // --- GOOGLE ICON SVG ---
@@ -75,39 +85,37 @@ const Onboarding: React.FC = () => {
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState<any>(null);
 
-  // --- FUNGSI PENTING: Initialize User & Redirect ---
-  // Ini membuat template data user di localStorage agar Profile.tsx tidak error
+  // --- LOGIKA SMART REDIRECT ---
   const initializeAndRedirect = (user: any) => {
     setSuccess(t("auth.success"));
 
-    // Cek apakah sudah ada data di localstorage (user lama)
-    const existingData = localStorage.getItem("user");
+    const existingDataString = localStorage.getItem("user");
+    let userData = existingDataString ? JSON.parse(existingDataString) : null;
 
-    if (!existingData) {
-      // Template User Baru
-      const initialUserData = {
+    if (!userData || (user.email && userData.email !== user.email)) {
+      userData = {
         name:
           user.displayName || (user.email ? user.email.split("@")[0] : "Guest"),
         email: user.email || "",
-        age: 0, // 0 menandakan belum diisi
+        uid: user.uid,
+        age: 0,
         height: 0,
         weight: 0,
-        gender: "male", // default
+        gender: "male",
         goal: "weight-loss",
         activityLevel: "moderate",
-        dietaryRestrictions: [],
-        allergies: [],
+        isSetupComplete: false,
         createdAt: new Date().toISOString(),
-        dailyCalories: 2000,
-        idealWeight: 0,
-        bmi: 0,
       };
-      localStorage.setItem("user", JSON.stringify(initialUserData));
+      localStorage.setItem("user", JSON.stringify(userData));
     }
 
-    // Redirect ke Profile Setup untuk melengkapi data
     setTimeout(() => {
-      navigate("/profile-setup");
+      if (userData.isSetupComplete) {
+        navigate("/dashboard");
+      } else {
+        navigate("/profile-setup");
+      }
     }, 1500);
   };
 
@@ -207,92 +215,100 @@ const Onboarding: React.FC = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden font-sans text-gray-100">
-      <style>{`
-        .glass-auth { background: rgba(10, 15, 30, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 0 40px rgba(0, 0, 0, 0.6); }
-        .input-tech { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); color: white; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; transition: all 0.3s ease; }
-        .input-tech:focus { border-color: #22c55e; box-shadow: 0 0 15px rgba(34, 197, 94, 0.3); outline: none; }
-        .tab-active { background: rgba(34, 197, 94, 0.1); border-bottom: 2px solid #22c55e; color: #22c55e; }
-        .tab-inactive { color: #6b7280; border-bottom: 2px solid transparent; }
-        .tab-inactive:hover { color: #d1d5db; }
-      `}</style>
+  // --- CUSTOM STYLES UNTUK LIGHT/DARK MODE ---
+  const inputClasses =
+    "w-full p-3 rounded-xl text-sm transition-all outline-none border font-sans font-bold " +
+    "bg-white dark:bg-black/40 " + // Light: Putih, Dark: Hitam transparan
+    "border-gray-200 dark:border-white/10 " + // Light: Border abu halus, Dark: Border putih tipis
+    "text-gray-900 dark:text-white " + // Warna teks
+    "placeholder-gray-400 dark:placeholder-gray-600 " + // Warna placeholder
+    "focus:border-blue-500 dark:focus:border-primary-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-primary-500/30 shadow-sm"; // Fokus ring biru/hijau
 
-      <DigitalGridBackground />
+  const tabActiveClasses =
+    "bg-blue-50 dark:bg-primary-900/20 border-b-2 border-blue-500 dark:border-primary-500 text-blue-600 dark:text-primary-500";
+  const tabInactiveClasses =
+    "text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5";
+
+  return (
+    <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden font-sans text-gray-900 dark:text-gray-100 bg-[#f8fafc] dark:bg-[#050b14] transition-colors duration-500">
+      <AdaptiveBackground />
       <div id="recaptcha-container"></div>
 
       <div className="relative z-10 w-full max-w-md p-4 animate-fade-in">
-        <div className="glass-auth rounded-2xl overflow-hidden relative border-t border-white/10">
-          <div className="p-6 pb-2 text-center">
-            <div className="w-10 h-10 bg-primary-900/50 rounded-lg mx-auto flex items-center justify-center mb-3 border border-primary-500/30 shadow-[0_0_20px_rgba(34,197,94,0.2)]">
-              <Lock className="w-5 h-5 text-primary-500" />
+        {/* ✨ UPDATE CARD: Glassmorphism Premium Light/Dark */}
+        <div className="bg-white/80 dark:bg-[#0a0f1e]/85 backdrop-blur-xl border border-white/60 dark:border-white/10 rounded-[2rem] overflow-hidden relative shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_rgba(0,0,0,0.6)] transition-all duration-300">
+          {/* Header */}
+          <div className="p-6 pb-4 text-center">
+            <div className="w-12 h-12 bg-blue-100 dark:bg-primary-900/50 rounded-2xl mx-auto flex items-center justify-center mb-4 border border-blue-200 dark:border-primary-500/30 shadow-sm dark:shadow-[0_0_20px_rgba(34,197,94,0.2)]">
+              <Lock className="w-6 h-6 text-blue-600 dark:text-primary-500" />
             </div>
-            <h2 className="text-xl font-display font-black uppercase tracking-tight text-white mb-1">
+            <h2 className="text-2xl font-display font-black uppercase tracking-tight text-gray-900 dark:text-white mb-1">
               {t("auth.title")}
             </h2>
-            <p className="text-gray-400 text-[10px] font-light uppercase tracking-widest">
+            <p className="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-widest">
               {t("auth.subtitle")}
             </p>
           </div>
 
-          <div className="flex border-b border-gray-800 mt-2">
+          {/* Login Method Tabs */}
+          <div className="flex border-b border-gray-100 dark:border-gray-800 mx-6">
             <button
               onClick={() => setLoginMethod("email")}
-              className={`flex-1 py-3 text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
-                loginMethod === "email" ? "tab-active" : "tab-inactive"
+              className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 rounded-t-lg ${
+                loginMethod === "email" ? tabActiveClasses : tabInactiveClasses
               }`}
             >
-              <Mail className="w-3 h-3" /> {t("auth.method.email")}
+              <Mail className="w-4 h-4" /> {t("auth.method.email")}
             </button>
             <button
               onClick={() => setLoginMethod("phone")}
-              className={`flex-1 py-3 text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
-                loginMethod === "phone" ? "tab-active" : "tab-inactive"
+              className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 rounded-t-lg ${
+                loginMethod === "phone" ? tabActiveClasses : tabInactiveClasses
               }`}
             >
-              <Smartphone className="w-3 h-3" /> {t("auth.method.phone")}
+              <Smartphone className="w-4 h-4" /> {t("auth.method.phone")}
             </button>
           </div>
 
-          <div className="p-6">
+          <div className="p-6 pt-6">
             {error && (
-              <div className="mb-4 p-2 bg-red-500/10 border border-red-500/50 rounded flex items-center gap-2 text-red-400 text-[10px] font-bold">
-                <AlertCircle className="w-3 h-3" /> {error}
+              <div className="mb-4 p-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/50 rounded-xl flex items-center gap-2 text-red-600 dark:text-red-400 text-xs font-bold">
+                <AlertCircle className="w-4 h-4" /> {error}
               </div>
             )}
             {success && (
-              <div className="mb-4 p-2 bg-green-500/10 border border-green-500/50 rounded flex items-center gap-2 text-green-400 text-[10px] font-bold">
-                <CheckCircle className="w-3 h-3" /> {success}
+              <div className="mb-4 p-3 bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/50 rounded-xl flex items-center gap-2 text-green-600 dark:text-green-400 text-xs font-bold">
+                <CheckCircle className="w-4 h-4" /> {success}
               </div>
             )}
 
             {loginMethod === "email" && (
               <form
                 onSubmit={handleEmailAuth}
-                className="space-y-4 animate-[fadeIn_0.3s_ease-out]"
+                className="space-y-5 animate-[fadeIn_0.3s_ease-out]"
               >
                 <div>
-                  <label className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1 block">
+                  <label className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest mb-1.5 block pl-1">
                     {t("auth.input.email")}
                   </label>
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full p-2.5 rounded text-sm input-tech"
-                    placeholder="USER@EXAMPLE.COM"
+                    className={inputClasses}
+                    placeholder="user@example.com"
                     required
                   />
                 </div>
                 <div>
-                  <label className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1 block">
+                  <label className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest mb-1.5 block pl-1">
                     {t("auth.input.pass")}
                   </label>
                   <input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full p-2.5 rounded text-sm input-tech"
+                    className={inputClasses}
                     placeholder="••••••••"
                     required
                   />
@@ -300,14 +316,10 @@ const Onboarding: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full py-3 bg-primary-600 hover:bg-primary-500 text-black font-display font-bold uppercase tracking-wider rounded-sm shadow-[0_0_20px_rgba(34,197,94,0.3)] transition-all mt-2 flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
-                  style={{
-                    clipPath:
-                      "polygon(5% 0, 100% 0, 100% 80%, 95% 100%, 0 100%, 0 20%)",
-                  }}
+                  className="w-full py-3.5 bg-gray-900 dark:bg-primary-600 hover:bg-gray-800 dark:hover:bg-primary-500 text-white font-display font-bold uppercase tracking-wider rounded-xl shadow-lg dark:shadow-[0_0_20px_rgba(34,197,94,0.3)] transition-all mt-2 flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
                 >
                   {isLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Activity className="w-4 h-4 animate-spin" />
                   ) : isRegistering ? (
                     t("auth.btn.signup")
                   ) : (
@@ -318,7 +330,7 @@ const Onboarding: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setIsRegistering(!isRegistering)}
-                    className="text-[10px] text-gray-400 hover:text-white underline decoration-gray-600 underline-offset-4 transition-colors"
+                    className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-bold transition-colors"
                   >
                     {isRegistering
                       ? t("auth.switch.login")
@@ -329,32 +341,28 @@ const Onboarding: React.FC = () => {
             )}
 
             {loginMethod === "phone" && (
-              <div className="space-y-4 animate-[fadeIn_0.3s_ease-out]">
+              <div className="space-y-5 animate-[fadeIn_0.3s_ease-out]">
                 {!showOtpInput ? (
                   <>
                     <div>
-                      <label className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1 block">
+                      <label className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest mb-1.5 block pl-1">
                         {t("auth.input.phone")}
                       </label>
                       <input
                         type="tel"
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value)}
-                        className="w-full p-2.5 rounded text-sm input-tech"
+                        className={inputClasses}
                         placeholder="+62 812 3456 7890"
                       />
                     </div>
                     <button
                       onClick={handleSendOtp}
                       disabled={isLoading || !phoneNumber}
-                      className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-display font-bold uppercase tracking-wider rounded-sm shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all mt-2 flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
-                      style={{
-                        clipPath:
-                          "polygon(5% 0, 100% 0, 100% 80%, 95% 100%, 0 100%, 0 20%)",
-                      }}
+                      className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-display font-bold uppercase tracking-wider rounded-xl shadow-lg shadow-blue-500/20 transition-all mt-2 flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
                     >
                       {isLoading ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <Activity className="w-4 h-4 animate-spin" />
                       ) : (
                         t("auth.btn.send_otp")
                       )}
@@ -363,14 +371,14 @@ const Onboarding: React.FC = () => {
                 ) : (
                   <>
                     <div>
-                      <label className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1 block">
+                      <label className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest mb-1.5 block pl-1">
                         {t("auth.input.otp")}
                       </label>
                       <input
                         type="text"
                         value={otp}
                         onChange={(e) => setOtp(e.target.value)}
-                        className="w-full p-2.5 rounded input-tech text-center text-xl tracking-[0.5em]"
+                        className={`${inputClasses} text-center text-xl tracking-[0.5em] font-display`}
                         placeholder="••••••"
                         maxLength={6}
                       />
@@ -378,14 +386,10 @@ const Onboarding: React.FC = () => {
                     <button
                       onClick={handleVerifyOtp}
                       disabled={isLoading || otp.length < 6}
-                      className="w-full py-3 bg-green-600 hover:bg-green-500 text-white font-display font-bold uppercase tracking-wider rounded-sm shadow-[0_0_20px_rgba(34,197,94,0.3)] transition-all mt-2 flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
-                      style={{
-                        clipPath:
-                          "polygon(5% 0, 100% 0, 100% 80%, 95% 100%, 0 100%, 0 20%)",
-                      }}
+                      className="w-full py-3.5 bg-green-600 hover:bg-green-700 text-white font-display font-bold uppercase tracking-wider rounded-xl shadow-lg shadow-green-500/20 transition-all mt-2 flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
                     >
                       {isLoading ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <Activity className="w-4 h-4 animate-spin" />
                       ) : (
                         t("auth.btn.verify")
                       )}
@@ -393,7 +397,7 @@ const Onboarding: React.FC = () => {
                     <div className="text-center pt-1">
                       <button
                         onClick={() => setShowOtpInput(false)}
-                        className="text-[10px] text-gray-500 hover:text-white"
+                        className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-bold"
                       >
                         Wrong Number? Back
                       </button>
@@ -403,12 +407,12 @@ const Onboarding: React.FC = () => {
               </div>
             )}
 
-            <div className="relative my-5">
+            <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-700"></div>
+                <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
               </div>
-              <div className="relative flex justify-center text-[9px] uppercase tracking-widest">
-                <span className="bg-[#0f1525] px-2 text-gray-500">
+              <div className="relative flex justify-center text-[9px] uppercase tracking-widest font-bold">
+                <span className="bg-white dark:bg-[#0f1525] px-3 text-gray-400 dark:text-gray-500 transition-colors duration-300">
                   {t("auth.divider")}
                 </span>
               </div>
@@ -418,26 +422,24 @@ const Onboarding: React.FC = () => {
               <button
                 onClick={handleGoogleAuth}
                 disabled={isLoading}
-                className="w-full py-3 bg-white text-gray-900 font-bold rounded-sm hover:bg-gray-100 transition-all flex items-center justify-center gap-3 text-xs uppercase tracking-wide group"
+                className="w-full py-3 bg-white dark:bg-white text-gray-700 dark:text-gray-900 font-bold rounded-xl border border-gray-200 dark:border-transparent hover:bg-gray-50 transition-all flex items-center justify-center gap-3 text-xs uppercase tracking-wide shadow-sm"
               >
                 <GoogleIcon />
-                <span className="group-hover:text-black">
-                  {t("auth.btn.google")}
-                </span>
+                <span>{t("auth.btn.google")}</span>
               </button>
               <button
                 onClick={handleGuestAuth}
                 disabled={isLoading}
-                className="w-full py-3 bg-transparent border border-gray-600 text-gray-400 font-bold rounded-sm hover:border-gray-400 hover:text-gray-200 transition-all flex items-center justify-center gap-3 text-xs uppercase tracking-wide"
+                className="w-full py-3 bg-transparent border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 font-bold rounded-xl hover:border-gray-400 dark:hover:border-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-all flex items-center justify-center gap-3 text-xs uppercase tracking-wide"
               >
                 <Ghost className="w-4 h-4" />
                 <span>{t("auth.btn.guest")}</span>
               </button>
             </div>
           </div>
-          <div className="bg-black/40 p-2 text-center flex items-center justify-center gap-2 border-t border-white/5">
-            <ShieldCheck className="w-3 h-3 text-gray-500" />
-            <span className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">
+          <div className="bg-gray-50/50 dark:bg-black/40 p-3 text-center flex items-center justify-center gap-2 border-t border-gray-100 dark:border-white/5">
+            <ShieldCheck className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+            <span className="text-[10px] text-gray-500 dark:text-gray-500 font-bold uppercase tracking-widest">
               Secure Encrypted Protocol
             </span>
           </div>

@@ -6,7 +6,6 @@ import React, {
   ReactNode,
 } from "react";
 
-// --- Tipe Data ---
 type Theme = "light" | "dark";
 type Language = "en" | "id";
 
@@ -20,7 +19,7 @@ interface UIContextType {
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
-    // ... (TEXT LAMA TETAP SAMA) ...
+    // --- GENERAL / LANDING PAGE ---
     "hero.tagline": "INTELLIGENT HEALTH ECOSYSTEM",
     "hero.title": "PERSONAL HEALTH AI",
     "hero.subtitle": "YOUR SMART WELLNESS COMPANION.",
@@ -47,6 +46,8 @@ const translations: Record<Language, Record<string, string>> = {
     "cta.desc":
       "Your personal AI health assistant is ready. Start your evolution today.",
     "btn.free": "TRY FOR FREE",
+
+    // --- AUTH & ONBOARDING ---
     "welcome.slide1.title": "AI Neural Analysis",
     "welcome.slide1.desc":
       "Our engine scans your bio-markers to calculate the perfect metabolic baseline.",
@@ -64,8 +65,6 @@ const translations: Record<Language, Record<string, string>> = {
       "To synchronize your AI-generated health protocol and save your preferences, secure system access is required.",
     "welcome.modal.btn": "Login / Sign Up",
     "welcome.modal.secure": "Secure Encrypted Connection",
-
-    // --- LOGIN SCREEN (UPDATED) ---
     "auth.title": "SYSTEM ACCESS",
     "auth.subtitle": "Authenticate to synchronize your neural profile.",
     "auth.method.email": "Email",
@@ -79,15 +78,68 @@ const translations: Record<Language, Record<string, string>> = {
     "auth.btn.verify": "VERIFY UPLINK",
     "auth.btn.send_otp": "TRANSMIT CODE",
     "auth.btn.google": "ACCESS VIA GOOGLE",
-    "auth.btn.guest": "CONTINUE AS GUEST", // NEW
+    "auth.btn.guest": "CONTINUE AS GUEST",
     "auth.divider": "OR ESTABLISH CONNECTION VIA",
     "auth.switch.signup": "New User? Create Profile",
     "auth.switch.login": "Existing User? Access System",
     "auth.error.generic": "Authentication Failed. Retry.",
     "auth.success": "Access Granted. Redirecting...",
+
+    // --- PROFILE SETUP ---
+    "profile.setup.title.step1": "Body Metrics",
+    "profile.setup.desc.step1": "Let's start by calculating your BMI.",
+    "profile.setup.label.height": "Height (cm)",
+    "profile.setup.label.weight": "Weight (kg)",
+    "profile.setup.bmi.estimated": "Estimated BMI",
+    "profile.setup.btn.next": "Next Step",
+    "profile.setup.title.step2": "Metabolic Profile",
+    "profile.setup.desc.step2": "We calculate your BMR & TDEE based on this.",
+    "profile.setup.label.age": "Age",
+    "profile.setup.label.gender": "Gender",
+    "profile.setup.gender.male": "Male",
+    "profile.setup.gender.female": "Female",
+    "profile.setup.label.activity": "Activity Level",
+    "profile.setup.activity.sedentary": "Sedentary (Little to no exercise)",
+    "profile.setup.activity.light": "Light (Exercise 1-3x/week)",
+    "profile.setup.activity.moderate": "Moderate (Exercise 3-5x/week)",
+    "profile.setup.activity.active": "Active (Exercise 6-7x/week)",
+    "profile.setup.activity.very_active": "Very Active (Physical job/athlete)",
+    "profile.setup.label.goal": "Primary Goal",
+    "profile.setup.goal.loss": "Weight Loss",
+    "profile.setup.goal.gain": "Weight Gain",
+    "profile.setup.goal.muscle": "Muscle Gain",
+    "profile.setup.bmr.title": "Basal Metabolic Rate",
+    "profile.setup.bmr.desc": "Calories burned at rest",
+    "profile.setup.btn.back": "Back",
+    "profile.setup.btn.finish": "Calculate & Finish",
+
+    // --- DASHBOARD (FIXED KEYS) ---
+    "dash.welcome": "Welcome Back,",
+    "dash.hello": "Hello,",
+    "dash.today_overview": "Today's Overview",
+    "dash.daily_fuel": "Daily Fuel",
+    "dash.opt_target": "Optimization Target",
+    "dash.kcal_left": "Kcal Left",
+    "dash.active": "Active",
+    "dash.no_data": "No Data",
+    "dash.protein": "Protein",
+    "dash.carbs": "Carbs",
+    "dash.fat": "Fat",
+    "dash.score": "Health Score",
+    "dash.bmi": "Body Mass Index",
+    "dash.hydration": "Hydration",
+    "dash.daily_goal": "Daily Goal",
+    "dash.quick_actions": "Quick Actions",
+    "dash.act_log_meal": "Log Meal",
+    "dash.desc_log_meal": "Track calories",
+    "dash.act_workout": "Workout",
+    "dash.desc_workout": "Log activity",
+    "dash.act_ai_scan": "AI Scan",
+    "dash.desc_ai_scan": "Analyze food",
+    "dash.weekly_activity": "Weekly Activity",
   },
   id: {
-    // ... (TEXT LAMA TETAP SAMA) ...
+    // --- GENERAL / LANDING PAGE ---
     "hero.tagline": "EKOSISTEM KESEHATAN CERDAS",
     "hero.title": "PERSONAL HEALTH AI",
     "hero.subtitle": "PENDAMPING KESEHATAN PINTAR ANDA.",
@@ -117,6 +169,8 @@ const translations: Record<Language, Record<string, string>> = {
     "cta.desc":
       "Asisten kesehatan AI pribadi Anda sudah siap. Mulai evolusi Anda hari ini.",
     "btn.free": "COBA GRATIS",
+
+    // --- AUTH & ONBOARDING ---
     "welcome.slide1.title": "Analisis Neural AI",
     "welcome.slide1.desc":
       "Mesin kami memindai penanda biologis Anda untuk menghitung dasar metabolik yang sempurna.",
@@ -134,8 +188,6 @@ const translations: Record<Language, Record<string, string>> = {
       "Untuk menyinkronkan protokol kesehatan yang dihasilkan AI dan menyimpan preferensi Anda, akses sistem yang aman diperlukan.",
     "welcome.modal.btn": "Masuk / Daftar",
     "welcome.modal.secure": "Koneksi Terenkripsi Aman",
-
-    // --- LOGIN SCREEN (UPDATED - ID) ---
     "auth.title": "AKSES SISTEM",
     "auth.subtitle": "Otentikasi untuk menyinkronkan profil neural Anda.",
     "auth.method.email": "Email",
@@ -149,12 +201,66 @@ const translations: Record<Language, Record<string, string>> = {
     "auth.btn.verify": "VERIFIKASI TAUTAN",
     "auth.btn.send_otp": "KIRIM KODE",
     "auth.btn.google": "AKSES VIA GOOGLE",
-    "auth.btn.guest": "LANJUT SEBAGAI TAMU", // NEW
+    "auth.btn.guest": "LANJUT SEBAGAI TAMU",
     "auth.divider": "ATAU SAMBUNGKAN MELALUI",
     "auth.switch.signup": "Pengguna Baru? Buat Profil",
     "auth.switch.login": "Pengguna Lama? Akses Sistem",
     "auth.error.generic": "Otentikasi Gagal. Coba lagi.",
     "auth.success": "Akses Diberikan. Mengalihkan...",
+
+    // --- PROFILE SETUP ---
+    "profile.setup.title.step1": "Metrik Tubuh",
+    "profile.setup.desc.step1": "Mari mulai dengan menghitung BMI Anda.",
+    "profile.setup.label.height": "Tinggi (cm)",
+    "profile.setup.label.weight": "Berat (kg)",
+    "profile.setup.bmi.estimated": "Estimasi BMI",
+    "profile.setup.btn.next": "Lanjut",
+    "profile.setup.title.step2": "Profil Metabolik",
+    "profile.setup.desc.step2":
+      "Kami menghitung BMR & TDEE Anda berdasarkan ini.",
+    "profile.setup.label.age": "Umur",
+    "profile.setup.label.gender": "Jenis Kelamin",
+    "profile.setup.gender.male": "Pria",
+    "profile.setup.gender.female": "Wanita",
+    "profile.setup.label.activity": "Level Aktivitas",
+    "profile.setup.activity.sedentary": "Sedentary (Jarang Olahraga)",
+    "profile.setup.activity.light": "Light (Olahraga 1-3x/minggu)",
+    "profile.setup.activity.moderate": "Moderate (Olahraga 3-5x/minggu)",
+    "profile.setup.activity.active": "Active (Olahraga 6-7x/minggu)",
+    "profile.setup.activity.very_active": "Very Active (Fisik Berat/Atlet)",
+    "profile.setup.label.goal": "Tujuan Utama",
+    "profile.setup.goal.loss": "Turun Berat Badan",
+    "profile.setup.goal.gain": "Tambah Berat Badan",
+    "profile.setup.goal.muscle": "Membentuk Otot",
+    "profile.setup.bmr.title": "Basal Metabolic Rate",
+    "profile.setup.bmr.desc": "Kalori terbakar saat istirahat",
+    "profile.setup.btn.back": "Kembali",
+    "profile.setup.btn.finish": "Hitung & Selesai",
+
+    // --- DASHBOARD (FIXED KEYS) ---
+    "dash.welcome": "Selamat Datang,",
+    "dash.hello": "Halo,",
+    "dash.today_overview": "Ringkasan Hari Ini",
+    "dash.daily_fuel": "Bahan Bakar Harian",
+    "dash.opt_target": "Target Optimasi",
+    "dash.kcal_left": "Sisa Kalori",
+    "dash.active": "Aktif",
+    "dash.no_data": "Belum Ada Data",
+    "dash.protein": "Protein",
+    "dash.carbs": "Karbo",
+    "dash.fat": "Lemak",
+    "dash.score": "Skor Kesehatan",
+    "dash.bmi": "Indeks Massa Tubuh",
+    "dash.hydration": "Hidrasi",
+    "dash.daily_goal": "Target Harian",
+    "dash.quick_actions": "Aksi Cepat",
+    "dash.act_log_meal": "Catat Makan",
+    "dash.desc_log_meal": "Hitung kalori",
+    "dash.act_workout": "Latihan",
+    "dash.desc_workout": "Catat aktivitas",
+    "dash.act_ai_scan": "Scan AI",
+    "dash.desc_ai_scan": "Analisa makanan",
+    "dash.weekly_activity": "Aktivitas Mingguan",
   },
 };
 
@@ -190,6 +296,7 @@ export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   const t = (key: string) => {
+    // Fallback: Jika key tidak ditemukan di kamus, tampilkan key-nya
     return translations[language][key] || key;
   };
 

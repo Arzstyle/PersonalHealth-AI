@@ -17,14 +17,23 @@ import Progress from "./components/Progress";
 import Profile from "./components/Profile";
 import ProfileSetup from "./components/ProfileSetup";
 import { MealProvider } from "./context/MealContext";
-import { UIProvider } from "./context/UIContext"; // ⬅️ Import baru
+import { UIProvider } from "./context/UIContext";
 
-// Check if user is onboarded
+// --- FUNGSI CEK USER LEBIH AMAN ---
 const isUserOnboarded = () => {
-  return localStorage.getItem("user") !== null;
+  const userData = localStorage.getItem("user");
+  if (!userData) return false;
+  try {
+    // Cek apakah JSON valid
+    JSON.parse(userData);
+    return true;
+  } catch (e) {
+    // Jika data korup, anggap belum login (hapus data rusak)
+    localStorage.removeItem("user");
+    return false;
+  }
 };
 
-// Protected route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
@@ -38,7 +47,6 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
 function App() {
   return (
     <Router>
-      {/* ⬇️ Bungkus dengan UIProvider untuk Theme & Language */}
       <UIProvider>
         <MealProvider>
           <Routes>
@@ -68,16 +76,18 @@ function App() {
               }
             />
 
+            {/* Protected routes */}
             <Route
               path="/profile-setup"
               element={
-                <Layout showNavigation={false}>
-                  <ProfileSetup />
-                </Layout>
+                <ProtectedRoute>
+                  <Layout showNavigation={false}>
+                    <ProfileSetup />
+                  </Layout>
+                </ProtectedRoute>
               }
             />
 
-            {/* Protected routes */}
             <Route
               path="/dashboard"
               element={

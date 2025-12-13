@@ -1,259 +1,201 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  ArrowRight,
-  Cpu,
+  ChevronRight,
   Activity,
-  BarChart3,
-  Lock,
-  CheckCircle,
-  ScanFace,
+  Brain,
+  Target,
+  Zap,
+  Shield,
+  ChevronLeft,
 } from "lucide-react";
-import { useUI } from "../context/UIContext"; // Import Context
-
-// --- BACKGROUND DIGITAL GRID (Tetap Sama) ---
-const DigitalGridBackground = () => (
-  <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-[#050b14] transition-colors duration-500">
-    <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px]"></div>
-    <div className="absolute inset-0 bg-gradient-to-t from-[#050b14] via-transparent to-[#050b14]"></div>
-    <div className="absolute top-[-20%] left-[-20%] w-[600px] h-[600px] bg-primary-500/10 rounded-full blur-[150px] mix-blend-screen animate-pulse"></div>
-    <div
-      className="absolute bottom-[-20%] right-[-20%] w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[150px] mix-blend-screen animate-pulse"
-      style={{ animationDelay: "2s" }}
-    ></div>
-  </div>
-);
-
-// --- KOMPONEN VISUAL (Tetap Sama) ---
-const VisualAIAnalysis = () => (
-  <div className="relative w-48 h-48 mx-auto flex items-center justify-center">
-    <div className="absolute inset-0 border-2 border-primary-500/30 rounded-full animate-[spin_10s_linear_infinite]"></div>
-    <div className="absolute inset-4 border border-dashed border-primary-400/50 rounded-full animate-[spin_15s_linear_infinite_reverse]"></div>
-    <div className="relative z-10 w-24 h-24 bg-gray-900 rounded-full border border-primary-500 flex items-center justify-center shadow-[0_0_30px_rgba(34,197,94,0.4)]">
-      <ScanFace className="w-10 h-10 text-primary-400 animate-pulse" />
-    </div>
-    <div className="absolute top-0 w-full h-1 bg-primary-500 shadow-[0_0_15px_#22c55e] animate-[scan_2s_ease-in-out_infinite] opacity-50"></div>
-  </div>
-);
-
-const VisualAdaptivePlan = () => (
-  <div className="relative w-full max-w-[200px] mx-auto perspective-1000">
-    <div className="absolute top-0 left-4 w-full h-24 bg-gray-800/50 border border-gray-600 rounded-lg transform rotate-6 scale-90"></div>
-    <div className="absolute top-2 left-2 w-full h-24 bg-gray-800/80 border border-gray-500 rounded-lg transform rotate-3 scale-95"></div>
-    <div className="relative w-full h-24 bg-gray-900 border border-blue-500 rounded-lg flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.3)]">
-      <div className="flex items-center gap-3">
-        <Activity className="w-6 h-6 text-blue-400" />
-        <div className="text-left">
-          <div className="h-2 w-16 bg-blue-500/50 rounded mb-1"></div>
-          <div className="h-1.5 w-10 bg-gray-600 rounded"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
-const VisualMetrics = () => (
-  <div className="relative w-full max-w-[220px] mx-auto h-32 flex items-end justify-between gap-2 px-4 border-b border-gray-700">
-    {[30, 50, 40, 70, 55, 85, 60].map((h, i) => (
-      <div
-        key={i}
-        className="w-full bg-gray-800 rounded-t-sm relative overflow-hidden group"
-      >
-        <div
-          className="absolute bottom-0 w-full bg-gradient-to-t from-purple-900 to-purple-400 transition-all duration-1000"
-          style={{
-            height: `${h}%`,
-            animation: `growBar 1s ease-out ${i * 0.1}s forwards`,
-          }}
-        ></div>
-      </div>
-    ))}
-    <div className="absolute top-0 right-0 p-1 bg-gray-800 rounded border border-gray-600">
-      <BarChart3 className="w-4 h-4 text-purple-400" />
-    </div>
-  </div>
-);
+import { useUI } from "../context/UIContext";
 
 const WelcomeIntro: React.FC = () => {
   const navigate = useNavigate();
-  const { t } = useUI(); // Menggunakan hook t() untuk translate
-
+  const { t } = useUI();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [showLoginModal, setShowLoginModal] = useState(false);
 
-  // DATA SLIDES (Sekarang menggunakan t() untuk teks dinamis)
   const slides = [
     {
       id: 1,
+      icon: Brain,
+      color: "text-purple-500",
+      bg: "bg-purple-500/10",
       title: t("welcome.slide1.title"),
       desc: t("welcome.slide1.desc"),
-      icon: Cpu,
-      color: "text-primary-500",
-      visual: <VisualAIAnalysis />,
+      features: ["Biometric Scan", "Metabolic Baseline", "Neural Profiling"],
     },
     {
       id: 2,
-      title: t("welcome.slide2.title"),
-      desc: t("welcome.slide2.desc"),
       icon: Activity,
       color: "text-blue-500",
-      visual: <VisualAdaptivePlan />,
+      bg: "bg-blue-500/10",
+      title: t("welcome.slide2.title"),
+      desc: t("welcome.slide2.desc"),
+      features: [
+        "Real-time Adjustments",
+        "Progressive Overload",
+        "Dynamic Nutrition",
+      ],
     },
     {
       id: 3,
+      icon: Target,
+      color: "text-green-500",
+      bg: "bg-green-500/10",
       title: t("welcome.slide3.title"),
       desc: t("welcome.slide3.desc"),
-      icon: BarChart3,
-      color: "text-purple-500",
-      visual: <VisualMetrics />,
+      features: ["Goal Tracking", "Data Visualization", "Milestone Rewards"],
     },
   ];
 
-  const handleNext = () => {
+  const nextSlide = () => {
     if (currentSlide < slides.length - 1) {
-      setCurrentSlide(currentSlide + 1);
+      setCurrentSlide((prev) => prev + 1);
     } else {
-      setShowLoginModal(true);
+      navigate("/onboarding");
     }
   };
 
-  const handleLoginRedirect = () => {
-    navigate("/onboarding");
+  const prevSlide = () => {
+    if (currentSlide > 0) {
+      setCurrentSlide((prev) => prev - 1);
+    }
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden font-sans text-gray-100">
-      <style>{`
-        .glass-card {
-          background: rgba(15, 23, 42, 0.6);
-          backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-        }
-        @keyframes scan {
-          0% { top: 0; opacity: 0; }
-          50% { opacity: 1; }
-          100% { top: 100%; opacity: 0; }
-        }
-        @keyframes growBar {
-          from { height: 0; }
-        }
-      `}</style>
+    // ✨ UPDATE CONTAINER: Mendukung transisi bg-white (light) ke bg-[#050b14] (dark)
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#f8fafc] dark:bg-[#050b14] relative overflow-hidden font-sans transition-colors duration-500">
+      {/* ✨ ADAPTIVE BACKGROUND AMBIENCE */}
+      {/* Light Mode: Pastel Blobs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-100 dark:opacity-0 transition-opacity duration-700">
+        <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-purple-200/40 rounded-full blur-[120px] mix-blend-multiply"></div>
+        <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-blue-200/40 rounded-full blur-[120px] mix-blend-multiply"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+      </div>
 
-      <DigitalGridBackground />
+      {/* Dark Mode: Digital Grid & Neon */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-0 dark:opacity-100 transition-opacity duration-700">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+        <div className="absolute top-[-20%] left-[-20%] w-[600px] h-[600px] bg-primary-500/10 rounded-full blur-[150px] mix-blend-screen animate-pulse"></div>
+        <div
+          className="absolute bottom-[-20%] right-[-20%] w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[150px] mix-blend-screen animate-pulse"
+          style={{ animationDelay: "2s" }}
+        ></div>
+      </div>
 
-      {/* --- MAIN CARD (PREVIEW TOUR) --- */}
-      <div
-        className={`relative z-10 w-full max-w-md p-1 transition-all duration-500 ${
-          showLoginModal ? "blur-sm scale-95 opacity-50" : "opacity-100"
-        }`}
-      >
-        <div className="glass-card rounded-3xl overflow-hidden relative">
-          {/* Header Progress */}
-          <div className="flex gap-1 p-6 pb-0">
-            {slides.map((_, idx) => (
-              <div
-                key={idx}
-                className={`h-1 flex-1 rounded-full transition-all duration-500 ${
-                  idx <= currentSlide ? "bg-white" : "bg-gray-700"
-                }`}
-              ></div>
-            ))}
-          </div>
-
-          {/* Slide Content */}
-          <div className="p-8 text-center min-h-[400px] flex flex-col justify-center">
-            {/* Dynamic Visual Area */}
-            <div className="mb-8 h-48 flex items-center justify-center">
-              {slides[currentSlide].visual}
+      <div className="relative z-10 w-full max-w-4xl p-4 sm:p-6 h-full sm:h-auto flex items-center justify-center">
+        {/* ✨ UPDATE CARD: Glassmorphism yang lebih cerah di light mode */}
+        <div className="bg-white/70 dark:bg-[#0a0f1e]/90 backdrop-blur-xl border border-white/60 dark:border-white/10 rounded-[2.5rem] p-6 sm:p-12 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] w-full relative overflow-hidden transition-all duration-300">
+          {/* Top Decorations */}
+          <div className="flex justify-between items-center mb-8 sm:mb-12">
+            <div className="flex items-center gap-2">
+              <Zap className="w-5 h-5 text-primary-600 dark:text-primary-500 fill-primary-600/20 dark:fill-primary-500/20" />
+              <span className="text-sm font-bold text-gray-900 dark:text-white tracking-widest uppercase font-display">
+                System Intro
+              </span>
             </div>
-
-            {/* Text Content */}
-            <div className="animate-fade-in" key={currentSlide}>
-              <div
-                className={`inline-flex items-center gap-2 mb-4 px-3 py-1 rounded-full bg-gray-800/50 border border-gray-700 mx-auto`}
-              >
-                {React.createElement(slides[currentSlide].icon, {
-                  className: `w-4 h-4 ${slides[currentSlide].color}`,
-                })}
-                {/* Menggunakan t() untuk label Feature */}
-                <span
-                  className={`text-xs font-bold uppercase tracking-widest ${slides[currentSlide].color}`}
-                >
-                  {t("welcome.feature")} 0{slides[currentSlide].id}
-                </span>
-              </div>
-
-              <h2 className="text-3xl font-display font-black uppercase mb-4 tracking-tight">
-                {slides[currentSlide].title}
-              </h2>
-
-              <p className="text-gray-400 font-light leading-relaxed">
-                {slides[currentSlide].desc}
-              </p>
+            <div className="flex gap-1">
+              {[0, 1, 2].map((_, idx) => (
+                <div
+                  key={idx}
+                  className={`h-1 rounded-full transition-all duration-500 ${
+                    idx === currentSlide
+                      ? "w-8 bg-primary-600 dark:bg-primary-500"
+                      : "w-2 bg-gray-300 dark:bg-gray-800"
+                  }`}
+                />
+              ))}
             </div>
           </div>
 
-          {/* Footer Action */}
-          <div className="p-6 border-t border-gray-800 bg-black/20">
-            <button
-              onClick={handleNext}
-              className="w-full flex items-center justify-center gap-2 py-4 bg-white text-black font-display font-bold uppercase tracking-wider rounded-sm hover:bg-gray-200 transition-colors"
-              style={{
-                clipPath:
-                  "polygon(5% 0, 100% 0, 100% 80%, 95% 100%, 0 100%, 0 20%)",
-              }}
+          <div className="relative overflow-hidden min-h-[400px] sm:min-h-[450px]">
+            <div
+              className="flex transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] h-full"
+              style={{ transform: `translateX(-${currentSlide * 100}%)` }}
             >
-              {/* Menggunakan t() untuk tombol */}
-              {currentSlide === slides.length - 1
-                ? t("welcome.btn.init")
-                : t("welcome.btn.next")}
-              <ArrowRight className="w-5 h-5" />
+              {slides.map((slide) => (
+                <div
+                  key={slide.id}
+                  className="w-full flex-shrink-0 flex flex-col sm:flex-row items-center gap-8 sm:gap-16 px-4"
+                >
+                  {/* Illustration/Icon Area */}
+                  <div className="relative group flex-1 flex justify-center">
+                    <div
+                      className={`absolute inset-0 ${slide.bg} rounded-full blur-[60px] group-hover:blur-[80px] transition-all opacity-70 dark:opacity-100`}
+                    ></div>
+                    <div className="relative w-48 h-48 sm:w-64 sm:h-64 bg-white/80 dark:bg-[#0f172a] rounded-full border-[3px] border-white/50 dark:border-white/10 flex items-center justify-center shadow-xl dark:shadow-[0_0_30px_rgba(0,0,0,0.3)] group-hover:scale-105 transition-transform duration-500">
+                      <div
+                        className={`absolute inset-2 rounded-full border border-dashed ${slide.color} opacity-30 animate-[spin_20s_linear_infinite]`}
+                      ></div>
+                      <slide.icon
+                        className={`w-20 h-20 sm:w-24 sm:h-24 ${slide.color} drop-shadow-[0_10px_10px_rgba(0,0,0,0.2)] dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]`}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Text Content Area */}
+                  <div className="flex-1 text-center sm:text-left space-y-6">
+                    <div>
+                      <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white font-display tracking-tight mb-4 leading-tight">
+                        {slide.title}
+                      </h2>
+                      <p className="text-gray-600 dark:text-gray-400 text-base sm:text-lg leading-relaxed font-light">
+                        {slide.desc}
+                      </p>
+                    </div>
+
+                    {/* Features List */}
+                    <div className="grid gap-3 pt-4">
+                      {slide.features.map((feature, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center gap-3 p-3 rounded-xl bg-white/60 dark:bg-white/5 border border-white/60 dark:border-white/10 backdrop-blur-sm shadow-sm"
+                        >
+                          <Shield className={`w-5 h-5 ${slide.color}`} />
+                          <span className="text-sm font-bold text-gray-800 dark:text-gray-200">
+                            {feature}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Bottom Navigation Buttons */}
+          <div className="flex justify-between items-center mt-8 sm:mt-12 pt-6 border-t border-gray-200 dark:border-white/10">
+            <button
+              onClick={prevSlide}
+              disabled={currentSlide === 0}
+              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${
+                currentSlide === 0
+                  ? "opacity-0 pointer-events-none"
+                  : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5"
+              }`}
+            >
+              <ChevronLeft className="w-5 h-5" />
+              <span>Back</span>
+            </button>
+
+            <button
+              onClick={nextSlide}
+              className="group relative flex items-center gap-3 px-8 py-4 bg-gray-900 dark:bg-primary-600 text-white rounded-xl font-bold overflow-hidden transition-all hover:shadow-lg dark:hover:shadow-[0_0_20px_rgba(34,197,94,0.4)] hover:scale-105 active:scale-100"
+            >
+              <div className="absolute inset-0 bg-white/20 translate-y-[100%] group-hover:translate-y-[0%] transition-transform duration-500"></div>
+              <span className="relative uppercase tracking-wider text-sm">
+                {currentSlide === slides.length - 1
+                  ? t("welcome.btn.init")
+                  : t("welcome.btn.next")}
+              </span>
+              <ChevronRight className="w-5 h-5 relative group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         </div>
       </div>
-
-      {/* --- POP-UP MODAL (LOGIN SUGGESTION) --- */}
-      {showLoginModal && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-fade-in"></div>
-
-          {/* Modal Card */}
-          <div className="relative z-60 glass-card max-w-sm w-full p-8 rounded-2xl text-center border border-primary-500/30 shadow-[0_0_50px_rgba(34,197,94,0.2)] animate-[slideUp_0.3s_ease-out_forwards]">
-            <div className="w-16 h-16 bg-primary-900/50 rounded-full flex items-center justify-center mx-auto mb-6 border border-primary-500/50">
-              <Lock className="w-8 h-8 text-primary-400" />
-            </div>
-
-            {/* Menggunakan t() untuk modal title */}
-            <h3 className="text-2xl font-display font-bold text-white mb-2 uppercase">
-              {t("welcome.modal.title")}
-            </h3>
-
-            {/* Menggunakan t() untuk modal desc */}
-            <p className="text-gray-400 mb-8 text-sm leading-relaxed">
-              {t("welcome.modal.desc")}
-            </p>
-
-            <div className="space-y-3">
-              <button
-                onClick={handleLoginRedirect}
-                className="w-full py-3 bg-primary-500 hover:bg-primary-400 text-black font-bold uppercase tracking-widest rounded transition-all shadow-[0_0_20px_rgba(34,197,94,0.4)]"
-              >
-                {/* Menggunakan t() untuk tombol login */}
-                {t("welcome.modal.btn")}
-              </button>
-
-              <div className="flex items-center justify-center gap-2 text-[10px] text-gray-500 uppercase tracking-widest mt-4">
-                <CheckCircle className="w-3 h-3 text-primary-500" />
-                {/* Menggunakan t() untuk secure text */}
-                <span>{t("welcome.modal.secure")}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
