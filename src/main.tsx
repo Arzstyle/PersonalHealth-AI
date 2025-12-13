@@ -1,13 +1,14 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
-import { NutritionProvider } from './context/NutritionContext';
-import './index.css';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import { NutritionProvider } from "./context/NutritionContext";
+import "./firebase"; // Initialize Firebase
+import "./index.css";
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <NutritionProvider>
       <App />
     </NutritionProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
 );

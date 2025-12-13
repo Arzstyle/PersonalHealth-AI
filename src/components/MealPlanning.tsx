@@ -196,46 +196,63 @@ const MealPlanning: React.FC = () => {
       }
 
       // --- TENTUKAN TARGET BERDASARKAN GOAL ---
+      // --- TENTUKAN TARGET BERDASARKAN GOAL & TDEE ---
       let minCal = 0;
       let maxCal = 0;
 
       if (dietGoal === "low-cal") {
-        // Cutting
-        // Updated: Range random 1200 - 1600
-        minCal = 1200;
-        maxCal = 1600;
+        // Cutting: Target TDEE - 500
+        // Referensi User: 1500 - 2000
+        const target = dailyCaloriesNeed - 500;
+        minCal = 1500;
+        maxCal = 2000;
+
+        // Adaptasi jika TDEE calculation berbeda jauh dari range referensi
+        if (target < 1500) minCal = Math.max(1200, target - 100);
+        if (target > 2000) maxCal = target + 100;
 
         const minProt = Math.round(weight * 1.6);
         const maxProt = Math.round(weight * 2.2);
 
-        targetInfo = `TARGET HARIAN: Kalori ${minCal}-${maxCal} kcal. Protein ${minProt}-${maxProt}g.`;
+        targetInfo = `TARGET HARIAN: Kalori ${minCal}-${maxCal} kcal (TDEE Est: ${dailyCaloriesNeed}). Protein ${minProt}-${maxProt}g.`;
         dietInstruction = `Tujuan: CLEAN EATING (Cutting/Defisit).
            - ATURAN UTAMA: Capai target kalori harian yang diminta.
            - Protein 1.6–2.2 g/kg BB.
-           - Karbohidrat 30–100g. Lemak 30-50g.
-           - Bahan: Dada ayam, ikan, telur, tahu/tempe, sayuran.`;
+           - Kurangi minyak & gula. Fokus Real Food.`;
       } else if (dietGoal === "bulking") {
-        // Bulking
-        const target = dailyCaloriesNeed + 400;
-        minCal = target;
-        maxCal = target + 500;
+        // Bulking: Target TDEE + 500
+        // Referensi User: 2800 - 3200
+        const target = dailyCaloriesNeed + 500;
+        minCal = 2800;
+        maxCal = 3200;
+
+        // Adaptasi TDEE
+        if (target < 2800) minCal = target - 200;
+        if (target > 3200) maxCal = target + 200;
 
         const minProt = Math.round(weight * 1.6);
         const maxProt = Math.round(weight * 2.0);
 
-        targetInfo = `TARGET HARIAN: Kalori ${minCal}-${maxCal} kcal. Protein ${minProt}-${maxProt}g.`;
+        targetInfo = `TARGET HARIAN: Kalori ${minCal}-${maxCal} kcal (Surplus). Protein ${minProt}-${maxProt}g.`;
         dietInstruction = `Tujuan: BULKING (Surplus Otot).
-           - Kalori Total WAJIB TINGGI (${minCal}+).
+           - Kalori Total WAJIB TINGGI.
            - Karbohidrat & Protein TINGGI.
-           - Porsi BESAR.`;
+           - Makan sering & porsi besar.`;
       } else {
-        // Maintenance
-        minCal = dailyCaloriesNeed - 200;
-        maxCal = dailyCaloriesNeed + 200;
+        // Maintenance: Target TDEE
+        // Referensi User: 2000 - 2600
+        const target = dailyCaloriesNeed;
+        minCal = 2000;
+        maxCal = 2600;
+
+        // Adaptasi TDEE
+        if (target < 2000) minCal = Math.max(1500, target - 200);
+        if (target > 2600) maxCal = target + 200;
 
         targetInfo = `TARGET HARIAN: Kalori ${minCal}-${maxCal} kcal.`;
         dietInstruction = `Tujuan: MAINTENANCE (Seimbang).
-           - Gizi seimbang. Porsi normal rumahan.`;
+           - Gizi seimbang. Porsi normal rumahan.
+           - Jaga asupan sesuai aktivitas.`;
       }
 
       // --- HITUNG RANDOm TARGET (Agar bervariasi) ---

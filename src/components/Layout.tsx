@@ -1,5 +1,7 @@
-import React from 'react';
-import Navigation from './Navigation';
+import React from "react";
+import Navigation from "./Navigation";
+import { useUI } from "../context/UIContext";
+import { Moon, Sun, Languages } from "lucide-react";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -7,45 +9,46 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, showNavigation = true }) => {
-  // Daftar emoji dekorasi
-  const backgroundEmojis = [
-    { icon: '🍎', top: '10%', left: '5%', size: 'text-6xl', delay: '0s' },
-    { icon: '💪', top: '25%', right: '8%', size: 'text-7xl', delay: '2s' },
-    { icon: '💧', top: '50%', left: '12%', size: 'text-5xl', delay: '4s' },
-    { icon: '🧘', top: '15%', left: '45%', size: 'text-6xl', delay: '1.5s' },
-    { icon: '🥗', bottom: '20%', right: '15%', size: 'text-6xl', delay: '3s' },
-    { icon: '👟', bottom: '10%', left: '8%', size: 'text-5xl', delay: '5s' },
-    { icon: '🩺', top: '60%', right: '5%', size: 'text-5xl', delay: '2.5s' },
-    { icon: '🥑', top: '80%', left: '50%', size: 'text-4xl', delay: '1s' },
-  ];
+  const { theme, toggleTheme, language, setLanguage } = useUI();
 
   return (
-    <div className="textured-bg flex flex-col relative min-h-screen overflow-x-hidden">
-      
-      {/* --- Layer Emoji Dekorasi --- */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden h-full w-full z-0">
-        {backgroundEmojis.map((item, index) => (
-          <div
-            key={index}
-            className={`floating-emoji ${item.size} select-none`}
-            style={{
-              top: item.top,
-              left: item.left,
-              right: item.right,
-              bottom: item.bottom,
-              animationDelay: item.delay
-            }}
-          >
-            {item.icon}
-          </div>
-        ))}
+    <div className="textured-bg flex flex-col relative min-h-screen overflow-x-hidden text-gray-800 dark:text-dark-text transition-colors duration-300">
+      {/* --- Floating Settings (Theme & Lang) --- */}
+      <div className="fixed top-4 right-4 z-50 flex gap-2">
+        {/* Language Toggle */}
+        <button
+          onClick={() => setLanguage(language === "en" ? "id" : "en")}
+          className="p-2 rounded-full glass-panel hover:bg-white/80 dark:hover:bg-gray-700 transition-all shadow-md flex items-center gap-2 px-4"
+          aria-label="Toggle Language"
+        >
+          <Languages className="w-5 h-5 text-primary-600" />
+          <span className="font-semibold text-sm">
+            {language === "en" ? "EN" : "ID"}
+          </span>
+        </button>
+
+        {/* Theme Toggle */}
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-full glass-panel hover:bg-white/80 dark:hover:bg-gray-700 transition-all shadow-md"
+          aria-label="Toggle Theme"
+        >
+          {theme === "light" ? (
+            <Moon className="w-5 h-5 text-gray-600" />
+          ) : (
+            <Sun className="w-5 h-5 text-yellow-400" />
+          )}
+        </button>
       </div>
 
       {showNavigation && <Navigation />}
-      
-      {/* PERBAIKAN: Hapus padding horizontal (px) di sini. 
-         Biarkan children yang mengatur paddingnya sendiri. */}
-      <main className={`flex-grow w-full relative z-10 ${showNavigation ? 'pt-28 pb-12' : 'py-12'}`}>
+
+      {/* Container Utama */}
+      <main
+        className={`flex-grow w-full relative z-10 ${
+          showNavigation ? "pt-28 pb-0" : "py-0"
+        }`}
+      >
         {children}
       </main>
     </div>

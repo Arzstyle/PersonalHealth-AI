@@ -1,721 +1,445 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  ChevronRight,
-  ChevronLeft,
-  User,
-  Target,
-  Activity,
-  LogIn,
+  Mail,
+  Smartphone,
+  Lock,
+  ShieldCheck,
+  AlertCircle,
+  CheckCircle,
+  Loader2,
+  Ghost,
 } from "lucide-react";
-import { signInWithGoogle } from "../firebase";
 import {
-  calculateBMI,
-  calculateIdealWeight,
-  calculateDailyCalories,
-} from "../utils/calculations";
-import {
-  ACTIVITY_LEVELS,
-  DIETARY_RESTRICTIONS,
-  COMMON_ALLERGIES,
-} from "../utils/constants";
-import type { User as UserType } from "../types";
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signInWithPhoneNumber,
+  RecaptchaVerifier,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signInAnonymously,
+} from "firebase/auth";
+import { useUI } from "../context/UIContext";
+
+// --- BACKGROUND DIGITAL GRID ---
+const DigitalGridBackground = () => (
+  <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-[#050b14] transition-colors duration-500">
+    <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+    <div className="absolute inset-0 bg-gradient-to-t from-[#050b14] via-transparent to-[#050b14]"></div>
+    <div className="absolute top-[-20%] left-[-20%] w-[600px] h-[600px] bg-primary-500/10 rounded-full blur-[150px] mix-blend-screen animate-pulse"></div>
+    <div
+      className="absolute bottom-[-20%] right-[-20%] w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[150px] mix-blend-screen animate-pulse"
+      style={{ animationDelay: "2s" }}
+    ></div>
+  </div>
+);
+
+// --- GOOGLE ICON SVG ---
+const GoogleIcon = () => (
+  <svg className="w-4 h-4" viewBox="0 0 24 24">
+    <path
+      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+      fill="#4285F4"
+    />
+    <path
+      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+      fill="#34A853"
+    />
+    <path
+      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.84z"
+      fill="#FBBC05"
+    />
+    <path
+      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+      fill="#EA4335"
+    />
+  </svg>
+);
 
 const Onboarding: React.FC = () => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    age: "",
-    gender: "",
-    height: "",
-    weight: "",
-    activityLevel: "",
-    goal: "",
-    dietaryRestrictions: [] as string[],
-    allergies: [] as string[],
-  });
-  const [loginEmail, setLoginEmail] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
-  const [loginError, setLoginError] = useState("");
-  const [isRegister, setIsRegister] = useState(false);
+  const { t } = useUI();
+  const auth = getAuth();
 
-  const handleGoogleLogin = async () => {
+  const [loginMethod, setLoginMethod] = useState<"email" | "phone">("email");
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [otp, setOtp] = useState("");
+  const [showOtpInput, setShowOtpInput] = useState(false);
+  const [confirmationResult, setConfirmationResult] = useState<any>(null);
+
+  // --- FUNGSI PENTING: Initialize User & Redirect ---
+  // Ini membuat template data user di localStorage agar Profile.tsx tidak error
+  const initializeAndRedirect = (user: any) => {
+    setSuccess(t("auth.success"));
+
+    // Cek apakah sudah ada data di localstorage (user lama)
+    const existingData = localStorage.getItem("user");
+
+    if (!existingData) {
+      // Template User Baru
+      const initialUserData = {
+        name:
+          user.displayName || (user.email ? user.email.split("@")[0] : "Guest"),
+        email: user.email || "",
+        age: 0, // 0 menandakan belum diisi
+        height: 0,
+        weight: 0,
+        gender: "male", // default
+        goal: "weight-loss",
+        activityLevel: "moderate",
+        dietaryRestrictions: [],
+        allergies: [],
+        createdAt: new Date().toISOString(),
+        dailyCalories: 2000,
+        idealWeight: 0,
+        bmi: 0,
+      };
+      localStorage.setItem("user", JSON.stringify(initialUserData));
+    }
+
+    // Redirect ke Profile Setup untuk melengkapi data
+    setTimeout(() => {
+      navigate("/profile-setup");
+    }, 1500);
+  };
+
+  const handleEmailAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
     try {
-      const user = await signInWithGoogle();
-      if (user) {
-        if (isRegister) {
-          // If in Register mode, proceed to next steps with pre-filled data
-          setFormData((prev) => ({
-            ...prev,
-            name: user.displayName || "",
-            email: user.email || "",
-          }));
-          setLoginEmail(user.email || "");
-          setCurrentStep(2);
-        } else {
-          // If in Login mode, go to dashboard
-          // Note: In a real app we would check if the user exists in DB.
-          // For now we create a session.
-          const userData = {
-            id: user.uid,
-            name: user.displayName || "User",
-            email: user.email || "",
-            // Provide defaults for required fields
-            age: 25,
-            gender: "male",
-            height: 170,
-            weight: 60,
-            activityLevel: "moderate",
-            goal: "weight-loss",
-            dietaryRestrictions: [],
-            allergies: [],
-            createdAt: new Date(),
-            bmi: 20,
-            idealWeight: 60,
-            dailyCalories: 2000,
-          };
-          localStorage.setItem("token", await user.getIdToken());
-          localStorage.setItem("user", JSON.stringify(userData));
-          navigate("/dashboard");
-        }
-      }
-    } catch (error: any) {
-      console.error(error);
-      setLoginError("Failed to sign in with Google");
-    }
-  };
-
-  const totalSteps = 5; // Updated to include login step
-
-  const handleNext = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      handleComplete();
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handleLogin = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/api/users/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        navigate("/dashboard");
-      } else {
-        setLoginError(data.message);
-      }
-    } catch (err) {
-      setLoginError("Server error");
-    }
-  };
-
-  const handleRegister = async () => {
-    if (!loginEmail || !loginPassword || !formData.name) {
-      setLoginError("Please fill in all fields");
-      return;
-    }
-
-    try {
-      const res = await fetch("http://localhost:5000/api/users/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName: formData.name,
-          email: loginEmail,
-          password: loginPassword,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        // Simpan token dan data user ke localStorage
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-
-        alert("Registration successful!");
-        navigate("/dashboard");
-      } else {
-        setLoginError(data.message || "Registration failed");
-      }
-    } catch (err) {
-      console.error("Error during registration:", err);
-      setLoginError("Server error");
-    }
-  };
-
-  const handleComplete = () => {
-    const user: UserType = {
-      id: Date.now().toString(),
-      name: formData.name,
-      email: formData.email,
-      age: parseInt(formData.age),
-      gender: formData.gender as "male" | "female",
-      height: parseInt(formData.height),
-      weight: parseInt(formData.weight),
-      activityLevel: formData.activityLevel as any,
-      goal: formData.goal as any,
-      dietaryRestrictions: formData.dietaryRestrictions,
-      allergies: formData.allergies,
-      bmi: calculateBMI(parseInt(formData.weight), parseInt(formData.height)),
-      idealWeight: calculateIdealWeight(
-        parseInt(formData.height),
-        formData.gender as "male" | "female"
-      ),
-      dailyCalories: calculateDailyCalories(
-        parseInt(formData.weight),
-        parseInt(formData.height),
-        parseInt(formData.age),
-        formData.gender as "male" | "female",
-        formData.activityLevel,
-        formData.goal
-      ),
-      createdAt: new Date(),
-    };
-
-    localStorage.setItem("user", JSON.stringify(user));
-    navigate("/dashboard");
-  };
-
-  const isStepValid = () => {
-    switch (currentStep) {
-      case 1:
-        return true; // Login step is optional, can skip
-      case 2:
-        return (
-          formData.name && formData.email && formData.age && formData.gender
+      let userCredential;
+      if (isRegistering) {
+        userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
         );
-      case 3:
-        return formData.height && formData.weight;
-      case 4:
-        return formData.activityLevel && formData.goal;
-      case 5:
-        return true; // Optional step
-      default:
-        return false;
+      } else {
+        userCredential = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+      }
+      initializeAndRedirect(userCredential.user);
+    } catch (err: any) {
+      setError(err.message || t("auth.error.generic"));
+      setIsLoading(false);
     }
   };
 
-  const handleCheckboxChange = (
-    value: string,
-    field: "dietaryRestrictions" | "allergies"
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: prev[field].includes(value)
-        ? prev[field].filter((item) => item !== value)
-        : [...prev[field], value],
-    }));
+  const handleSendOtp = async () => {
+    if (!phoneNumber) return;
+    setError(null);
+    setIsLoading(true);
+    try {
+      if (!(window as any).recaptchaVerifier) {
+        (window as any).recaptchaVerifier = new RecaptchaVerifier(
+          auth,
+          "recaptcha-container",
+          {
+            size: "invisible",
+            callback: () => {},
+          }
+        );
+      }
+      const appVerifier = (window as any).recaptchaVerifier;
+      const confirmation = await signInWithPhoneNumber(
+        auth,
+        phoneNumber,
+        appVerifier
+      );
+      setConfirmationResult(confirmation);
+      setShowOtpInput(true);
+      setSuccess("OTP Transmitted.");
+    } catch (err: any) {
+      console.error(err);
+      setError("Failed to send SMS. Check format (+62...).");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otp || !confirmationResult) return;
+    setError(null);
+    setIsLoading(true);
+    try {
+      const result = await confirmationResult.confirm(otp);
+      initializeAndRedirect(result.user);
+    } catch (err: any) {
+      setError("Invalid OTP Code.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    setError(null);
+    setIsLoading(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      initializeAndRedirect(result.user);
+    } catch (err: any) {
+      setError(err.message || "Google Auth Failed");
+      setIsLoading(false);
+    }
+  };
+
+  const handleGuestAuth = async () => {
+    setError(null);
+    setIsLoading(true);
+    try {
+      const result = await signInAnonymously(auth);
+      initializeAndRedirect(result.user);
+    } catch (err: any) {
+      setError("Guest Access Failed");
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
-      <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl overflow-hidden">
-        {/* Background Logo Transparan */}
-        <img
-          src="/img/logo.jpg" // ubah sesuai lokasi file logomu
-          alt="Logo Background"
-          className="absolute opacity-10 w-[500px] h-[500px] object-contain z-0 select-none pointer-events-none"
-          style={{
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            filter: "blur(1px)",
-          }}
-        />
+    <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden font-sans text-gray-100">
+      <style>{`
+        .glass-auth { background: rgba(10, 15, 30, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 0 40px rgba(0, 0, 0, 0.6); }
+        .input-tech { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); color: white; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; transition: all 0.3s ease; }
+        .input-tech:focus { border-color: #22c55e; box-shadow: 0 0 15px rgba(34, 197, 94, 0.3); outline: none; }
+        .tab-active { background: rgba(34, 197, 94, 0.1); border-bottom: 2px solid #22c55e; color: #22c55e; }
+        .tab-inactive { color: #6b7280; border-bottom: 2px solid transparent; }
+        .tab-inactive:hover { color: #d1d5db; }
+      `}</style>
 
-        {/* Progress Bar */}
-        <div className="bg-gradient-to-r from-green-600 to-blue-600 p-6">
-          <div className="flex items-center justify-between text-white mb-4">
-            <h1 className="text-2xl font-bold">Let's Get Started</h1>
-            <span className="text-green-100">
-              Step {currentStep} of {totalSteps}
-            </span>
-          </div>
-          <div className="w-full bg-green-700 rounded-full h-2">
-            <div
-              className="bg-white h-2 rounded-full transition-all duration-500"
-              style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-            ></div>
-          </div>
-        </div>
+      <DigitalGridBackground />
+      <div id="recaptcha-container"></div>
 
-        <div className="p-8">
-          {currentStep === 1 && (
-            <div className="space-y-6">
-              <div className="text-center mb-8">
-                <LogIn className="h-12 w-12 text-green-600 mx-auto mb-4" />
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                  {isRegister ? "Create Account" : "Welcome Back"}
-                </h2>
-                <p className="text-gray-600">
-                  {isRegister
-                    ? "Register to get started"
-                    : "Login to your account or create a new one"}
-                </p>
+      <div className="relative z-10 w-full max-w-md p-4 animate-fade-in">
+        <div className="glass-auth rounded-2xl overflow-hidden relative border-t border-white/10">
+          <div className="p-6 pb-2 text-center">
+            <div className="w-10 h-10 bg-primary-900/50 rounded-lg mx-auto flex items-center justify-center mb-3 border border-primary-500/30 shadow-[0_0_20px_rgba(34,197,94,0.2)]">
+              <Lock className="w-5 h-5 text-primary-500" />
+            </div>
+            <h2 className="text-xl font-display font-black uppercase tracking-tight text-white mb-1">
+              {t("auth.title")}
+            </h2>
+            <p className="text-gray-400 text-[10px] font-light uppercase tracking-widest">
+              {t("auth.subtitle")}
+            </p>
+          </div>
+
+          <div className="flex border-b border-gray-800 mt-2">
+            <button
+              onClick={() => setLoginMethod("email")}
+              className={`flex-1 py-3 text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
+                loginMethod === "email" ? "tab-active" : "tab-inactive"
+              }`}
+            >
+              <Mail className="w-3 h-3" /> {t("auth.method.email")}
+            </button>
+            <button
+              onClick={() => setLoginMethod("phone")}
+              className={`flex-1 py-3 text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
+                loginMethod === "phone" ? "tab-active" : "tab-inactive"
+              }`}
+            >
+              <Smartphone className="w-3 h-3" /> {t("auth.method.phone")}
+            </button>
+          </div>
+
+          <div className="p-6">
+            {error && (
+              <div className="mb-4 p-2 bg-red-500/10 border border-red-500/50 rounded flex items-center gap-2 text-red-400 text-[10px] font-bold">
+                <AlertCircle className="w-3 h-3" /> {error}
               </div>
+            )}
+            {success && (
+              <div className="mb-4 p-2 bg-green-500/10 border border-green-500/50 rounded flex items-center gap-2 text-green-400 text-[10px] font-bold">
+                <CheckCircle className="w-3 h-3" /> {success}
+              </div>
+            )}
 
-              <div className="space-y-4">
-                {isRegister && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      placeholder="Enter your full name"
-                    />
-                  </div>
-                )}
-
+            {loginMethod === "email" && (
+              <form
+                onSubmit={handleEmailAuth}
+                className="space-y-4 animate-[fadeIn_0.3s_ease-out]"
+              >
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email
+                  <label className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1 block">
+                    {t("auth.input.email")}
                   </label>
                   <input
                     type="email"
-                    value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full p-2.5 rounded text-sm input-tech"
+                    placeholder="USER@EXAMPLE.COM"
+                    required
                   />
                 </div>
-
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Password
+                  <label className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1 block">
+                    {t("auth.input.pass")}
                   </label>
                   <input
                     type="password"
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full p-2.5 rounded text-sm input-tech"
+                    placeholder="••••••••"
+                    required
                   />
                 </div>
-
-                {loginError && (
-                  <p className="text-red-600 text-sm">{loginError}</p>
-                )}
-
                 <button
-                  onClick={isRegister ? handleRegister : handleLogin}
-                  className="w-full px-8 py-3 bg-gradient-to-r from-green-600 to-blue-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full py-3 bg-primary-600 hover:bg-primary-500 text-black font-display font-bold uppercase tracking-wider rounded-sm shadow-[0_0_20px_rgba(34,197,94,0.3)] transition-all mt-2 flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
+                  style={{
+                    clipPath:
+                      "polygon(5% 0, 100% 0, 100% 80%, 95% 100%, 0 100%, 0 20%)",
+                  }}
                 >
-                  {isRegister ? "Register" : "Login"}
-                </button>
-
-                <div className="relative my-4">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300"></div>
-                  </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white text-gray-500">
-                      Or continue with
-                    </span>
-                  </div>
-                </div>
-
-                <button
-                  onClick={handleGoogleLogin}
-                  className="w-full px-8 py-3 bg-white border border-gray-300 text-gray-700 font-semibold rounded-lg shadow-sm hover:bg-gray-50 flex items-center justify-center gap-3 transition-all duration-200"
-                >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">
-                    <path
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                      fill="#4285F4"
-                    />
-                    <path
-                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                      fill="#34A853"
-                    />
-                    <path
-                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.84z"
-                      fill="#FBBC05"
-                    />
-                    <path
-                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                      fill="#EA4335"
-                    />
-                  </svg>
-                  Google
-                </button>
-
-                <p className="text-center text-sm text-gray-600 mt-4">
-                  {isRegister ? (
-                    <>
-                      Already have an account?{" "}
-                      <span
-                        onClick={() => setIsRegister(false)}
-                        className="text-green-600 cursor-pointer font-semibold hover:underline"
-                      >
-                        Login
-                      </span>
-                    </>
+                  {isLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : isRegistering ? (
+                    t("auth.btn.signup")
                   ) : (
-                    <>
-                      Don’t have an account?{" "}
-                      <span
-                        onClick={() => setIsRegister(true)}
-                        className="text-green-600 cursor-pointer font-semibold hover:underline"
-                      >
-                        Register
-                      </span>
-                    </>
+                    t("auth.btn.login")
                   )}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {currentStep === 2 && (
-            <div className="space-y-6">
-              <div className="text-center mb-8">
-                <User className="h-12 w-12 text-green-600 mx-auto mb-4" />
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                  Basic Information
-                </h2>
-                <p className="text-gray-600">Tell us about yourself</p>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Enter your full name"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Enter your email"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Age
-                  </label>
-                  <input
-                    type="number"
-                    value={formData.age}
-                    onChange={(e) =>
-                      setFormData({ ...formData, age: e.target.value })
-                    }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Enter your age"
-                    min="18"
-                    max="100"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Gender
-                  </label>
-                  <select
-                    value={formData.gender}
-                    onChange={(e) =>
-                      setFormData({ ...formData, gender: e.target.value })
-                    }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                </button>
+                <div className="text-center pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setIsRegistering(!isRegistering)}
+                    className="text-[10px] text-gray-400 hover:text-white underline decoration-gray-600 underline-offset-4 transition-colors"
                   >
-                    <option value="">Select gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                  </select>
+                    {isRegistering
+                      ? t("auth.switch.login")
+                      : t("auth.switch.signup")}
+                  </button>
                 </div>
+              </form>
+            )}
+
+            {loginMethod === "phone" && (
+              <div className="space-y-4 animate-[fadeIn_0.3s_ease-out]">
+                {!showOtpInput ? (
+                  <>
+                    <div>
+                      <label className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1 block">
+                        {t("auth.input.phone")}
+                      </label>
+                      <input
+                        type="tel"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        className="w-full p-2.5 rounded text-sm input-tech"
+                        placeholder="+62 812 3456 7890"
+                      />
+                    </div>
+                    <button
+                      onClick={handleSendOtp}
+                      disabled={isLoading || !phoneNumber}
+                      className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-display font-bold uppercase tracking-wider rounded-sm shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all mt-2 flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
+                      style={{
+                        clipPath:
+                          "polygon(5% 0, 100% 0, 100% 80%, 95% 100%, 0 100%, 0 20%)",
+                      }}
+                    >
+                      {isLoading ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        t("auth.btn.send_otp")
+                      )}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <label className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1 block">
+                        {t("auth.input.otp")}
+                      </label>
+                      <input
+                        type="text"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                        className="w-full p-2.5 rounded input-tech text-center text-xl tracking-[0.5em]"
+                        placeholder="••••••"
+                        maxLength={6}
+                      />
+                    </div>
+                    <button
+                      onClick={handleVerifyOtp}
+                      disabled={isLoading || otp.length < 6}
+                      className="w-full py-3 bg-green-600 hover:bg-green-500 text-white font-display font-bold uppercase tracking-wider rounded-sm shadow-[0_0_20px_rgba(34,197,94,0.3)] transition-all mt-2 flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
+                      style={{
+                        clipPath:
+                          "polygon(5% 0, 100% 0, 100% 80%, 95% 100%, 0 100%, 0 20%)",
+                      }}
+                    >
+                      {isLoading ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        t("auth.btn.verify")
+                      )}
+                    </button>
+                    <div className="text-center pt-1">
+                      <button
+                        onClick={() => setShowOtpInput(false)}
+                        className="text-[10px] text-gray-500 hover:text-white"
+                      >
+                        Wrong Number? Back
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
+            <div className="relative my-5">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-700"></div>
+              </div>
+              <div className="relative flex justify-center text-[9px] uppercase tracking-widest">
+                <span className="bg-[#0f1525] px-2 text-gray-500">
+                  {t("auth.divider")}
+                </span>
               </div>
             </div>
-          )}
 
-          {currentStep === 3 && (
-            <div className="space-y-6">
-              <div className="text-center mb-8">
-                <Activity className="h-12 w-12 text-green-600 mx-auto mb-4" />
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                  Physical Measurements
-                </h2>
-                <p className="text-gray-600">
-                  Help us calculate your personal metrics
-                </p>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Height (cm)
-                  </label>
-                  <input
-                    type="number"
-                    value={formData.height}
-                    onChange={(e) =>
-                      setFormData({ ...formData, height: e.target.value })
-                    }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Enter your height in cm"
-                    min="100"
-                    max="250"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Weight (kg)
-                  </label>
-                  <input
-                    type="number"
-                    value={formData.weight}
-                    onChange={(e) =>
-                      setFormData({ ...formData, weight: e.target.value })
-                    }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Enter your weight in kg"
-                    min="30"
-                    max="300"
-                  />
-                </div>
-              </div>
-
-              {formData.height && formData.weight && (
-                <div className="mt-8 p-4 bg-green-50 rounded-lg">
-                  <h3 className="font-semibold text-green-800 mb-2">
-                    Your BMI Preview
-                  </h3>
-                  <p className="text-green-700">
-                    BMI:{" "}
-                    {calculateBMI(
-                      parseInt(formData.weight),
-                      parseInt(formData.height)
-                    )}
-                  </p>
-                </div>
-              )}
+            <div className="space-y-3">
+              <button
+                onClick={handleGoogleAuth}
+                disabled={isLoading}
+                className="w-full py-3 bg-white text-gray-900 font-bold rounded-sm hover:bg-gray-100 transition-all flex items-center justify-center gap-3 text-xs uppercase tracking-wide group"
+              >
+                <GoogleIcon />
+                <span className="group-hover:text-black">
+                  {t("auth.btn.google")}
+                </span>
+              </button>
+              <button
+                onClick={handleGuestAuth}
+                disabled={isLoading}
+                className="w-full py-3 bg-transparent border border-gray-600 text-gray-400 font-bold rounded-sm hover:border-gray-400 hover:text-gray-200 transition-all flex items-center justify-center gap-3 text-xs uppercase tracking-wide"
+              >
+                <Ghost className="w-4 h-4" />
+                <span>{t("auth.btn.guest")}</span>
+              </button>
             </div>
-          )}
-
-          {currentStep === 4 && (
-            <div className="space-y-6">
-              <div className="text-center mb-8">
-                <Target className="h-12 w-12 text-green-600 mx-auto mb-4" />
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                  Goals & Activity
-                </h2>
-                <p className="text-gray-600">What do you want to achieve?</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-4">
-                  Activity Level
-                </label>
-                <div className="space-y-3">
-                  {ACTIVITY_LEVELS.map((level) => (
-                    <label
-                      key={level.value}
-                      className="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50"
-                    >
-                      <input
-                        type="radio"
-                        name="activityLevel"
-                        value={level.value}
-                        checked={formData.activityLevel === level.value}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            activityLevel: e.target.value,
-                          })
-                        }
-                        className="text-green-600 focus:ring-green-500"
-                      />
-                      <div className="ml-3">
-                        <div className="text-sm font-medium text-gray-900">
-                          {level.label}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {level.description}
-                        </div>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-4">
-                  Primary Goal
-                </label>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {[
-                    {
-                      value: "weight-loss",
-                      label: "Weight Loss",
-                      desc: "Lose weight healthily",
-                    },
-                    {
-                      value: "weight-gain",
-                      label: "Weight Gain",
-                      desc: "Gain healthy weight",
-                    },
-                    {
-                      value: "muscle-gain",
-                      label: "Muscle Gain",
-                      desc: "Build lean muscle",
-                    },
-                  ].map((goal) => (
-                    <label
-                      key={goal.value}
-                      className="flex flex-col items-center p-6 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50"
-                    >
-                      <input
-                        type="radio"
-                        name="goal"
-                        value={goal.value}
-                        checked={formData.goal === goal.value}
-                        onChange={(e) =>
-                          setFormData({ ...formData, goal: e.target.value })
-                        }
-                        className="text-green-600 focus:ring-green-500 mb-3"
-                      />
-                      <div className="text-center">
-                        <div className="text-sm font-medium text-gray-900">
-                          {goal.label}
-                        </div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          {goal.desc}
-                        </div>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {currentStep === 5 && (
-            <div className="space-y-6">
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                  Dietary Preferences
-                </h2>
-                <p className="text-gray-600">
-                  Optional: Tell us about any dietary restrictions or allergies
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-4">
-                  Dietary Restrictions
-                </label>
-                <div className="grid md:grid-cols-3 gap-3">
-                  {DIETARY_RESTRICTIONS.map((restriction) => (
-                    <label
-                      key={restriction}
-                      className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={formData.dietaryRestrictions.includes(
-                          restriction
-                        )}
-                        onChange={() =>
-                          handleCheckboxChange(
-                            restriction,
-                            "dietaryRestrictions"
-                          )
-                        }
-                        className="text-green-600 focus:ring-green-500 rounded"
-                      />
-                      <span className="ml-2 text-sm text-gray-700">
-                        {restriction}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-4">
-                  Allergies
-                </label>
-                <div className="grid md:grid-cols-4 gap-3">
-                  {COMMON_ALLERGIES.map((allergy) => (
-                    <label
-                      key={allergy}
-                      className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={formData.allergies.includes(allergy)}
-                        onChange={() =>
-                          handleCheckboxChange(allergy, "allergies")
-                        }
-                        className="text-green-600 focus:ring-green-500 rounded"
-                      />
-                      <span className="ml-2 text-sm text-gray-700">
-                        {allergy}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Navigation Buttons */}
-          <div className="flex justify-between mt-8 pt-6 border-t">
-            <button
-              onClick={handlePrevious}
-              disabled={currentStep === 1}
-              className="flex items-center px-6 py-3 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <ChevronLeft className="h-5 w-5 mr-1" />
-              Previous
-            </button>
-
-            <button
-              onClick={handleNext}
-              disabled={!isStepValid()}
-              className="flex items-center px-8 py-3 bg-gradient-to-r from-green-600 to-blue-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-            >
-              {currentStep === totalSteps ? "Complete Setup" : "Next"}
-              <ChevronRight className="h-5 w-5 ml-1" />
-            </button>
+          </div>
+          <div className="bg-black/40 p-2 text-center flex items-center justify-center gap-2 border-t border-white/5">
+            <ShieldCheck className="w-3 h-3 text-gray-500" />
+            <span className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">
+              Secure Encrypted Protocol
+            </span>
           </div>
         </div>
       </div>
