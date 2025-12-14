@@ -25,7 +25,7 @@ export const generateMealRecommendations = (user: User): MealRecommendation[] =>
   const lunchCalories = Math.round(targetCalories * 0.35);
   const dinnerCalories = Math.round(targetCalories * 0.30);
 
-  // Filter foods based on dietary restrictions
+  
   const availableFoods = SAMPLE_FOODS.filter(food => {
     if (user.dietaryRestrictions.includes('Vegetarian') && 
         ['Grilled Chicken Breast', 'Salmon Fillet'].includes(food.name)) return false;
@@ -40,7 +40,7 @@ export const generateMealRecommendations = (user: User): MealRecommendation[] =>
 
   const recommendations: MealRecommendation[] = [];
 
-  // Breakfast Recommendation
+  
   const breakfastFoods = getOptimalFoodCombination(availableFoods, breakfastCalories, 'breakfast');
   const breakfastNutrition = calculateNutrition(breakfastFoods);
   recommendations.push({
@@ -50,7 +50,7 @@ export const generateMealRecommendations = (user: User): MealRecommendation[] =>
     reasoning: getBreakfastReasoning(user, breakfastFoods)
   });
 
-  // Lunch Recommendation
+  
   const lunchFoods = getOptimalFoodCombination(availableFoods, lunchCalories, 'lunch');
   const lunchNutrition = calculateNutrition(lunchFoods);
   recommendations.push({
@@ -60,7 +60,7 @@ export const generateMealRecommendations = (user: User): MealRecommendation[] =>
     reasoning: getLunchReasoning(user, lunchFoods)
   });
 
-  // Dinner Recommendation
+  
   const dinnerFoods = getOptimalFoodCombination(availableFoods, dinnerCalories, 'dinner');
   const dinnerNutrition = calculateNutrition(dinnerFoods);
   recommendations.push({
@@ -95,7 +95,7 @@ export const generateWorkoutRecommendation = (user: User): WorkoutRecommendation
     reasoning = `Moderate strength training to build healthy muscle mass while gaining weight. Includes flexibility work for overall wellness and injury prevention.`;
   }
 
-  // Adjust difficulty based on activity level
+  
   if (user.activityLevel === 'sedentary' || user.activityLevel === 'light') {
     exercises = exercises.filter(ex => ex.difficulty === 'beginner');
   } else if (user.activityLevel === 'very-active') {
@@ -120,14 +120,14 @@ export const intelligentSearch = (query: string, user: User): { foods: Food[]; e
   let exercises: Exercise[] = [];
   let answer = '';
 
-  // Post-workout protein search
+  
   if (lowerQuery.includes('post-workout') && lowerQuery.includes('protein')) {
     const proteinAmount = extractNumber(query) || 30;
     foods = SAMPLE_FOODS.filter(food => food.protein >= proteinAmount * 0.7);
     answer = `Here are high-protein foods perfect for post-workout recovery. Aim for ${proteinAmount}g protein within 30 minutes after your workout to optimize muscle protein synthesis.`;
   }
   
-  // Low-carb snack search
+  
   else if (lowerQuery.includes('low-carb') && lowerQuery.includes('snack')) {
     const calorieLimit = extractNumber(query) || 200;
     foods = SAMPLE_FOODS.filter(food => 
@@ -138,7 +138,7 @@ export const intelligentSearch = (query: string, user: User): { foods: Food[]; e
     answer = `These low-carb snacks will keep you satisfied without spiking blood sugar. Perfect for maintaining ketosis or reducing overall carb intake.`;
   }
   
-  // Belly fat workouts
+  
   else if (lowerQuery.includes('belly fat') || lowerQuery.includes('abs')) {
     exercises = SAMPLE_EXERCISES.filter(ex => 
       ex.category === 'Cardio' || 
@@ -148,13 +148,13 @@ export const intelligentSearch = (query: string, user: User): { foods: Food[]; e
     answer = `While spot reduction isn't possible, these exercises combine cardio for overall fat loss with core strengthening. Consistency with diet is key for reducing belly fat.`;
   }
   
-  // High protein search
+  
   else if (lowerQuery.includes('high protein')) {
     foods = SAMPLE_FOODS.filter(food => food.protein >= 15).sort((a, b) => b.protein - a.protein);
     answer = `These high-protein foods support muscle building, satiety, and metabolic health. Aim for 0.8-1g protein per kg body weight daily.`;
   }
   
-  // Weight loss foods
+  
   else if (lowerQuery.includes('weight loss') && lowerQuery.includes('food')) {
     foods = SAMPLE_FOODS.filter(food => 
       food.calories <= 150 && 
@@ -163,7 +163,7 @@ export const intelligentSearch = (query: string, user: User): { foods: Food[]; e
     answer = `These nutrient-dense, lower-calorie foods promote satiety and support weight loss through high fiber and protein content.`;
   }
   
-  // Muscle gain foods
+  
   else if (lowerQuery.includes('muscle gain') || lowerQuery.includes('bulking')) {
     foods = SAMPLE_FOODS.filter(food => 
       food.protein >= 15 || 
@@ -172,19 +172,19 @@ export const intelligentSearch = (query: string, user: User): { foods: Food[]; e
     answer = `These foods provide the protein and calories needed for muscle growth. Combine with progressive strength training for best results.`;
   }
   
-  // Cardio workouts
+  
   else if (lowerQuery.includes('cardio') || lowerQuery.includes('fat burn')) {
     exercises = SAMPLE_EXERCISES.filter(ex => ex.category === 'Cardio');
     answer = `Cardiovascular exercises improve heart health and burn calories efficiently. Aim for 150 minutes of moderate cardio weekly.`;
   }
   
-  // Strength workouts
+  
   else if (lowerQuery.includes('strength') || lowerQuery.includes('muscle')) {
     exercises = SAMPLE_EXERCISES.filter(ex => ex.category === 'Strength');
     answer = `Strength training builds muscle, increases metabolism, and improves bone density. Focus on progressive overload for continuous improvement.`;
   }
   
-  // Default response
+  
   else {
     foods = SAMPLE_FOODS.slice(0, 3);
     exercises = SAMPLE_EXERCISES.slice(0, 3);
@@ -194,12 +194,12 @@ export const intelligentSearch = (query: string, user: User): { foods: Food[]; e
   return { foods, exercises, answer };
 };
 
-// Helper functions
+
 const getOptimalFoodCombination = (foods: Food[], targetCalories: number, mealType: string): Food[] => {
   const combination: Food[] = [];
   let currentCalories = 0;
 
-  // Meal-specific food preferences
+  
   const mealPreferences = {
     breakfast: ['Greek Yogurt', 'Almonds'],
     lunch: ['Grilled Chicken Breast', 'Brown Rice', 'Broccoli'],
@@ -212,7 +212,7 @@ const getOptimalFoodCombination = (foods: Food[], targetCalories: number, mealTy
     )
   );
 
-  // Add preferred foods first
+  
   for (const food of preferredFoods) {
     if (currentCalories + food.calories <= targetCalories * 1.1) {
       combination.push(food);
@@ -220,7 +220,7 @@ const getOptimalFoodCombination = (foods: Food[], targetCalories: number, mealTy
     }
   }
 
-  // Fill remaining calories if needed
+  
   if (currentCalories < targetCalories * 0.8) {
     const remainingFoods = foods.filter(food => !combination.includes(food));
     for (const food of remainingFoods) {

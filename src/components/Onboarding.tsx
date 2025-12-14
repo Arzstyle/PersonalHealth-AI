@@ -22,17 +22,17 @@ import {
 } from "firebase/auth";
 import { useUI } from "../context/UIContext";
 
-// --- ADAPTIVE BACKGROUND ---
+
 const AdaptiveBackground = () => (
   <>
-    {/* Light Mode: Pastel Blobs & Subtle Grid */}
+    {}
     <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-100 dark:opacity-0 transition-opacity duration-700">
       <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-blue-200/40 rounded-full blur-[120px] mix-blend-multiply"></div>
       <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-purple-200/40 rounded-full blur-[120px] mix-blend-multiply"></div>
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px]"></div>
     </div>
 
-    {/* Dark Mode: Digital Grid & Neon */}
+    {}
     <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-0 dark:opacity-100 transition-opacity duration-700 bg-[#050b14]">
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px]"></div>
       <div className="absolute inset-0 bg-gradient-to-t from-[#050b14] via-transparent to-[#050b14]"></div>
@@ -45,7 +45,7 @@ const AdaptiveBackground = () => (
   </>
 );
 
-// --- GOOGLE ICON SVG ---
+
 const GoogleIcon = () => (
   <svg className="w-4 h-4" viewBox="0 0 24 24">
     <path
@@ -85,7 +85,7 @@ const Onboarding: React.FC = () => {
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState<any>(null);
 
-  // --- LOGIKA SMART REDIRECT ---
+  
   const initializeAndRedirect = (user: any) => {
     setSuccess(t("auth.success"));
 
@@ -215,14 +215,14 @@ const Onboarding: React.FC = () => {
     }
   };
 
-  // --- CUSTOM STYLES UNTUK LIGHT/DARK MODE ---
+  
   const inputClasses =
     "w-full p-3 rounded-xl text-sm transition-all outline-none border font-sans font-bold " +
-    "bg-white dark:bg-black/40 " + // Light: Putih, Dark: Hitam transparan
-    "border-gray-200 dark:border-white/10 " + // Light: Border abu halus, Dark: Border putih tipis
-    "text-gray-900 dark:text-white " + // Warna teks
-    "placeholder-gray-400 dark:placeholder-gray-600 " + // Warna placeholder
-    "focus:border-blue-500 dark:focus:border-primary-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-primary-500/30 shadow-sm"; // Fokus ring biru/hijau
+    "bg-white dark:bg-black/40 " + 
+    "border-gray-200 dark:border-white/10 " + 
+    "text-gray-900 dark:text-white " + 
+    "placeholder-gray-400 dark:placeholder-gray-600 " + 
+    "focus:border-blue-500 dark:focus:border-primary-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-primary-500/30 shadow-sm"; 
 
   const tabActiveClasses =
     "bg-blue-50 dark:bg-primary-900/20 border-b-2 border-blue-500 dark:border-primary-500 text-blue-600 dark:text-primary-500";
@@ -235,9 +235,9 @@ const Onboarding: React.FC = () => {
       <div id="recaptcha-container"></div>
 
       <div className="relative z-10 w-full max-w-md p-4 animate-fade-in">
-        {/* ✨ UPDATE CARD: Glassmorphism Premium Light/Dark */}
+        {}
         <div className="bg-white/80 dark:bg-[#0a0f1e]/85 backdrop-blur-xl border border-white/60 dark:border-white/10 rounded-[2rem] overflow-hidden relative shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_rgba(0,0,0,0.6)] transition-all duration-300">
-          {/* Header */}
+          {}
           <div className="p-6 pb-4 text-center">
             <div className="w-12 h-12 bg-blue-100 dark:bg-primary-900/50 rounded-2xl mx-auto flex items-center justify-center mb-4 border border-blue-200 dark:border-primary-500/30 shadow-sm dark:shadow-[0_0_20px_rgba(34,197,94,0.2)]">
               <Lock className="w-6 h-6 text-blue-600 dark:text-primary-500" />
@@ -250,7 +250,7 @@ const Onboarding: React.FC = () => {
             </p>
           </div>
 
-          {/* Login Method Tabs */}
+          {}
           <div className="flex border-b border-gray-100 dark:border-gray-800 mx-6">
             <button
               onClick={() => setLoginMethod("email")}

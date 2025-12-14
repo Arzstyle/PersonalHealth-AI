@@ -3,17 +3,19 @@ export interface User {
   name: string;
   email: string;
   age: number;
-  gender: 'male' | 'female';
-  height: number; // in cm
-  weight: number; // in kg
-  activityLevel: 'sedentary' | 'light' | 'moderate' | 'active' | 'very-active';
-  goal: 'weight-loss' | 'weight-gain' | 'muscle-gain';
+  gender: "male" | "female";
+  height: number; 
+  weight: number; 
+  activityLevel: "sedentary" | "light" | "moderate" | "active" | "very-active";
+  goal: "weight-loss" | "weight-gain" | "muscle-gain";
   dietaryRestrictions: string[];
   allergies: string[];
   bmi: number;
   idealWeight: number;
   dailyCalories: number;
   createdAt: Date;
+  targetDate?: Date;
+  onboardingCompleted?: boolean;
 }
 
 export interface Food {
@@ -49,9 +51,9 @@ export interface Exercise {
   name: string;
   category: string;
   description: string;
-  duration: number; // in minutes
+  duration: number; 
   caloriesBurned: number;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  difficulty: "beginner" | "intermediate" | "advanced";
   equipment: string[];
   instructions: string[];
 }

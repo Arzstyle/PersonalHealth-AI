@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
-
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA8zgSg8rQvFDUwu63IiOoThOoTaJWEUeo",
@@ -12,19 +13,8 @@ const firebaseConfig = {
   measurementId: "G-C0F94T3MG4",
 };
 
-
 const app = initializeApp(firebaseConfig);
-
-
+export const analytics = getAnalytics(app);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
-
-export const signInWithGoogle = async () => {
-  try {
-    const result = await signInWithPopup(auth, googleProvider);
-    return result.user;
-  } catch (error) {
-    console.error("Error signing in with Google", error);
-    throw error;
-  }
-};
+export const db = getFirestore(app);

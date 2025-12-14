@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useUI } from "../context/UIContext";
 
-// --- VISUAL: 3D AI REACTOR CORE (Tetap Sama) ---
+
 const AIReactor = () => {
   return (
     <div className="relative w-full h-[500px] flex items-center justify-center perspective-[1000px]">
@@ -34,7 +34,7 @@ const AIReactor = () => {
       </div>
       <div className="absolute w-[450px] h-[450px] border-[2px] border-dashed border-purple-500/20 rounded-full animate-[spin_20s_linear_infinite]"></div>
 
-      {/* Data Float 1 */}
+      {}
       <div className="absolute top-20 right-10 p-3 glass-tech rounded-lg animate-float flex items-center gap-3 border-l-2 border-primary-500">
         <Activity className="w-5 h-5 text-primary-400" />
         <div>
@@ -45,7 +45,7 @@ const AIReactor = () => {
         </div>
       </div>
 
-      {/* Data Float 2 */}
+      {}
       <div
         className="absolute bottom-20 left-10 p-3 glass-tech rounded-lg animate-float flex items-center gap-3 border-r-2 border-blue-500"
         style={{ animationDelay: "2s" }}
@@ -62,7 +62,7 @@ const AIReactor = () => {
   );
 };
 
-// --- BACKGROUND: Digital Grid (Tetap Sama) ---
+
 const DigitalGridBackground = () => (
   <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-gray-50 dark:bg-dark-bg transition-colors duration-500">
     <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px]"></div>
@@ -72,7 +72,7 @@ const DigitalGridBackground = () => (
   </div>
 );
 
-// --- SCROLL REVEAL (Tetap Sama) ---
+
 interface ScrollRevealProps {
   children: React.ReactNode;
   delay?: string;
@@ -161,9 +161,9 @@ const LandingPage: React.FC = () => {
   return (
     <div className="h-screen w-full overflow-y-scroll snap-y snap-mandatory scroll-smooth bg-transparent text-gray-800 dark:text-gray-100 no-scrollbar relative font-sans">
       <style>{`
-        /* Glass Tech Card (Selalu gelap agar tech feel tetap dapat, tapi teks di dalamnya putih) */
+        
         .glass-tech {
-          background: rgba(15, 23, 42, 0.85); /* Sedikit lebih gelap agar kontras di light mode */
+          background: rgba(15, 23, 42, 0.85); 
           backdrop-filter: blur(12px);
           border: 1px solid rgba(255, 255, 255, 0.1);
           box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
@@ -175,10 +175,10 @@ const LandingPage: React.FC = () => {
 
       <DigitalGridBackground />
 
-      {/* --- HERO SECTION --- */}
+      {}
       <section className="snap-start min-h-screen w-full flex items-center justify-center relative p-6 lg:p-12 z-10 overflow-hidden">
         <div className="max-w-7xl w-full mx-auto grid lg:grid-cols-2 gap-16 items-center">
-          {/* LEFT: Text Content */}
+          {}
           <div className="text-center lg:text-left order-2 lg:order-1">
             <ScrollReveal delay="0.1s" direction="left">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm bg-primary-500/10 border border-primary-500/30 mb-8">
@@ -190,7 +190,7 @@ const LandingPage: React.FC = () => {
             </ScrollReveal>
 
             <ScrollReveal delay="0.2s" direction="left">
-              {/* FIXED: Text colors for light mode (text-gray-900) */}
+              {}
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-black mb-6 leading-[0.9] tracking-tighter text-gray-900 dark:text-white uppercase">
                 {titleMain}
                 <br />
@@ -204,7 +204,7 @@ const LandingPage: React.FC = () => {
             </ScrollReveal>
 
             <ScrollReveal delay="0.4s" direction="left">
-              {/* FIXED: Description text color */}
+              {}
               <p className="text-lg md:text-xl text-gray-700 dark:text-gray-400 mb-10 max-w-xl lg:mx-0 leading-relaxed font-light border-l-4 border-primary-500 pl-6">
                 {t("hero.desc")}
               </p>
@@ -239,7 +239,7 @@ const LandingPage: React.FC = () => {
             </ScrollReveal>
           </div>
 
-          {/* RIGHT: 3D Reactor */}
+          {}
           <div className="order-1 lg:order-2 flex justify-center relative">
             <ScrollReveal delay="0.4s" direction="right">
               <AIReactor />
@@ -255,17 +255,17 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* --- GOALS SECTION --- */}
+      {}
       <section className="snap-start min-h-screen w-full flex items-center justify-center p-6 z-10 bg-white/50 dark:bg-black/40 backdrop-blur-sm">
         <div className="max-w-7xl w-full mx-auto">
           <ScrollReveal>
             <div className="text-center mb-16">
-              {/* FIXED: Title Text Color */}
+              {}
               <h2 className="text-4xl md:text-6xl font-display font-bold mb-4 text-gray-900 dark:text-white uppercase tracking-tight">
                 {t("goals.title")}
               </h2>
               <div className="h-1 w-24 bg-primary-500 mx-auto rounded-full mb-4"></div>
-              {/* FIXED: Desc Text Color */}
+              {}
               <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto font-light">
                 {t("goals.desc")}
               </p>
@@ -279,11 +279,7 @@ const LandingPage: React.FC = () => {
                 delay={`${index * 0.15}s`}
                 direction="up"
               >
-                {/* Glass Tech Card: 
-                   Karena menggunakan class 'glass-tech' yang backgroundnya gelap, 
-                   maka teks di DALAM card ini harus tetap TERANG (putih/abu terang) 
-                   agar terbaca di atas background gelap, meskipun mode Light.
-                */}
+                {}
                 <Link
                   to="/welcome"
                   state={{ selectedGoal: goal.id }}
@@ -335,12 +331,12 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* --- WHY SECTION --- */}
+      {}
       <section className="snap-start min-h-screen w-full flex items-center justify-center p-6 z-10">
         <div className="max-w-7xl w-full mx-auto grid lg:grid-cols-2 gap-12 items-center">
           <div className="order-2 lg:order-1 relative">
             <ScrollReveal direction="right">
-              {/* Glass Tech Card (Tetap gelap di dalam) */}
+              {}
               <div className="relative glass-tech p-8 rounded-2xl border border-white/10">
                 <div className="absolute -top-5 -left-5 w-20 h-20 border-t-4 border-l-4 border-primary-500 rounded-tl-3xl opacity-50"></div>
 
@@ -377,12 +373,12 @@ const LandingPage: React.FC = () => {
 
           <div className="order-1 lg:order-2 pl-0 lg:pl-10">
             <ScrollReveal direction="left">
-              {/* FIXED: Heading Text Color */}
+              {}
               <h2 className="text-4xl md:text-6xl font-display font-black text-gray-900 dark:text-white mb-8 uppercase leading-none">
                 {t("why.title")}
               </h2>
               <div className="space-y-8">
-                {/* FIXED: Body Text Color */}
+                {}
                 <p className="text-gray-700 dark:text-gray-400 text-lg mb-8">
                   {t("why.desc")}
                 </p>
@@ -402,7 +398,7 @@ const LandingPage: React.FC = () => {
                     key={i}
                     className="border-l-2 border-gray-300 dark:border-gray-700 pl-6 hover:border-primary-500 transition-colors"
                   >
-                    {/* FIXED: Stat Numbers */}
+                    {}
                     <div className="text-3xl font-display font-bold text-gray-900 dark:text-white mb-1">
                       {stat.val}
                     </div>
@@ -420,18 +416,18 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* --- CTA SECTION --- */}
+      {}
       <section className="snap-start min-h-screen w-full flex items-center justify-center p-6 z-10">
         <ScrollReveal>
           <div className="max-w-5xl mx-auto text-center relative">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-primary-500/10 rounded-full blur-[100px]"></div>
 
-            {/* FIXED: CTA Heading */}
+            {}
             <h2 className="relative text-5xl md:text-8xl font-display font-black text-gray-900 dark:text-white mb-8 uppercase tracking-tighter leading-none">
               {t("cta.title")}
             </h2>
 
-            {/* FIXED: CTA Desc */}
+            {}
             <p className="relative text-xl text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto font-light">
               {t("cta.desc")}
             </p>

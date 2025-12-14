@@ -11,7 +11,7 @@ interface NutritionData {
   protein: number;
   carbs: number;
   fat: number;
-  date: string; // Format: YYYY-MM-DD
+  date: string; 
 }
 
 interface NutritionContextType {
@@ -27,7 +27,7 @@ export const NutritionProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [nutrition, setNutrition] = useState<NutritionData>(() => {
-    // Initialize state from localStorage if available, for persistence across sessions
+    
     try {
       const savedNutrition = localStorage.getItem("todayNutrition");
       if (savedNutrition) {
@@ -46,7 +46,7 @@ export const NutritionProvider: React.FC<{ children: ReactNode }> = ({
     };
   });
 
-  // Persist nutrition data to localStorage whenever it changes
+  
   useEffect(() => {
     localStorage.setItem("todayNutrition", JSON.stringify(nutrition));
   }, [nutrition]);

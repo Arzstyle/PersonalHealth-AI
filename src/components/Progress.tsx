@@ -1,149 +1,125 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
-  TrendingUp,
   Calendar,
-  Camera,
   Plus,
   X,
   Scale,
-  ChevronDown,
   ArrowDown,
   History,
   Share2,
   Save,
-  FileText,
   UploadCloud,
   Trash2,
+  Activity,
+  Target,
+  BarChart3,
+  ScanLine,
+  Ruler,
 } from "lucide-react";
+import { useUI } from "../context/UIContext";
 
-// --- HELPER: Format Date untuk Input & Display ---
 const formatDateForInput = (date: Date) => date.toISOString().split("T")[0];
 const formatDateForDisplay = (dateStr: string) => {
   const date = new Date(dateStr);
   return date.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
 };
 
-// --- MOCK DATA INITIAL ---
-// Menggunakan format YYYY-MM-DD agar mudah disortir
-const INITIAL_HISTORY = [
-  { date: "2024-12-01", weight: 78.5, notes: "Awal program" },
-  { date: "2024-12-05", weight: 77.8, notes: "" },
-  { date: "2024-12-10", weight: 77.0, notes: "Mulai rutin cardio" },
-  { date: "2024-12-15", weight: 76.2, notes: "" },
-  { date: "2024-12-20", weight: 75.5, notes: "Merasa lebih ringan" },
-];
-
-const INITIAL_MEASUREMENTS = [
-  {
-    part: "Pinggang",
-    current: 85,
-    start: 90,
-    unit: "cm",
-    color: "bg-blue-500",
-  },
-  { part: "Dada", current: 98, start: 102, unit: "cm", color: "bg-purple-500" },
-  {
-    part: "Lengan",
-    current: 32,
-    start: 34,
-    unit: "cm",
-    color: "bg-orange-500",
-  },
-  { part: "Paha", current: 58, start: 60, unit: "cm", color: "bg-green-500" },
-];
-
-// --- COMPONENT: ADVANCED SVG CHART WITH TOOLTIP ---
-const AdvancedLineChart = ({ data }: { data: typeof INITIAL_HISTORY }) => {
+const RoboticLineChart = ({ data }: { data: any[] }) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const chartRef = useRef<HTMLDivElement>(null);
-
+  const pathRef = useRef<SVGPathElement>(null);
   const height = 220;
   const width = 600;
   const paddingX = 30;
   const paddingY = 20;
 
-  if (data.length < 2) {
+  useEffect(() => {
+    if (pathRef.current) {
+      const length = pathRef.current.getTotalLength();
+      pathRef.current.style.strokeDasharray = `${length} ${length}`;
+      pathRef.current.style.strokeDashoffset = `${length}`;
+      pathRef.current.getBoundingClientRect();
+      pathRef.current.style.transition = "stroke-dashoffset 1.5s ease-in-out";
+      pathRef.current.style.strokeDashoffset = "0";
+    }
+  }, [data]);
+
+  if (data.length < 2)
     return (
-      <div className="h-full flex items-center justify-center text-gray-400">
-        Butuh minimal 2 data untuk grafik.
+      <div className="h-full flex items-center justify-center text-slate-500 font-mono text-sm transition-colors duration-500">
+        NO DATA POINTS DETECTED
       </div>
     );
-  }
 
   const weights = data.map((d) => d.weight);
-  // Tambahkan padding dinamis ke min/max agar grafik tidak mepet atas/bawah
   const minWeight = Math.min(...weights) - 1.5;
   const maxWeight = Math.max(...weights) + 1.5;
   const chartHeight = height - paddingY * 2;
   const chartWidth = width - paddingX * 2;
 
-  // Normalisasi koordinat Y
-  const getY = (w: number) => {
-    return (
-      height -
-      paddingY -
-      ((w - minWeight) / (maxWeight - minWeight)) * chartHeight
-    );
-  };
+  const getY = (w: number) =>
+    height -
+    paddingY -
+    ((w - minWeight) / (maxWeight - minWeight)) * chartHeight;
+  const getX = (index: number) =>
+    paddingX + (index / (data.length - 1)) * chartWidth;
 
-  // Normalisasi koordinat X
-  const getX = (index: number) => {
-    return paddingX + (index / (data.length - 1)) * chartWidth;
-  };
-
-  // Buat Path Garis
   const pathData = data
     .map((d, i) => `${i === 0 ? "M" : "L"} ${getX(i)} ${getY(d.weight)}`)
     .join(" ");
-
-  // Buat Area Gradient di bawah garis
-  const areaPathData = `
-    ${pathData} 
-    L ${getX(data.length - 1)} ${height} 
-    L ${getX(0)} ${height} 
-    Z
-  `;
+  const areaPathData = `${pathData} L ${getX(
+    data.length - 1
+  )} ${height} L ${getX(0)} ${height} Z`;
 
   return (
     <div
-      className="w-full h-full overflow-visible relative"
+      className="w-full h-full overflow-visible relative group"
       ref={chartRef}
       onMouseLeave={() => setHoveredIndex(null)}
     >
+      <div className="absolute inset-0 pointer-events-none opacity-20 dark:opacity-30 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:20px_20px] animate-pulse-slow transition-opacity duration-500"></div>
+
       <svg
         viewBox={`0 0 ${width} ${height}`}
         className="w-full h-full overflow-visible"
         preserveAspectRatio="none"
       >
         <defs>
-          <linearGradient id="chartGradientOrange" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#f97316" stopOpacity="0.2" />
-            <stop offset="100%" stopColor="#f97316" stopOpacity="0" />
+          <linearGradient id="chartGradientCyan" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#06b6d4" stopOpacity="0" />
           </linearGradient>
         </defs>
-
-        {/* Area Fill */}
-        <path d={areaPathData} fill="url(#chartGradientOrange)" />
-
-        {/* Main Line */}
         <path
+          d={areaPathData}
+          fill="url(#chartGradientCyan)"
+          className="opacity-0 animate-fade-in delay-700 forwards"
+          style={{ animationFillMode: "forwards" }}
+        />
+        <path
+          ref={pathRef}
           d={pathData}
           fill="none"
-          stroke="#f97316"
+          stroke="#06b6d4"
           strokeWidth="3"
           strokeLinecap="round"
           strokeLinejoin="round"
+          className="drop-shadow-[0_0_8px_rgba(6,182,212,0.5)] transition-all duration-500"
         />
 
-        {/* Interactive Dots */}
         {data.map((d, i) => {
           const cx = getX(i);
           const cy = getY(d.weight);
           const isHovered = hoveredIndex === i;
-
           return (
-            <g key={i}>
-              {/* Invisible larger circle for easier hovering */}
+            <g
+              key={i}
+              className="opacity-0 animate-fade-in delay-1000 forwards"
+              style={{
+                animationFillMode: "forwards",
+                animationDelay: `${1000 + i * 100}ms`,
+              }}
+            >
               <circle
                 cx={cx}
                 cy={cy}
@@ -152,595 +128,549 @@ const AdvancedLineChart = ({ data }: { data: typeof INITIAL_HISTORY }) => {
                 onMouseEnter={() => setHoveredIndex(i)}
                 className="cursor-pointer"
               />
-              {/* Visible Dot */}
               <circle
                 cx={cx}
                 cy={cy}
                 r={isHovered ? "6" : "4"}
-                fill="white"
-                stroke="#f97316"
+                fill="var(--bg-card)"
+                stroke="#06b6d4"
                 strokeWidth={isHovered ? "3" : "2"}
-                className="transition-all duration-200 pointer-events-none"
+                className="transition-all duration-500 ease-in-out pointer-events-none fill-slate-50 dark:fill-slate-900"
               />
             </g>
           );
         })}
       </svg>
 
-      {/* CUSTOM HTML TOOLTIP */}
       {hoveredIndex !== null && (
         <div
-          className="absolute z-20 bg-gray-900 text-white p-3 rounded-xl shadow-xl pointer-events-none transition-all duration-200"
+          className="absolute z-20 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-cyan-500/50 text-slate-800 dark:text-white p-3 rounded-xl shadow-lg shadow-cyan-100 dark:shadow-[0_0_15px_rgba(6,182,212,0.3)] pointer-events-none transition-all duration-200 animate-fade-in-up"
           style={{
             left: `${(getX(hoveredIndex) / width) * 100}%`,
             top: `${(getY(data[hoveredIndex].weight) / height) * 100}%`,
-            transform: "translate(-50%, -130%)", // Posisikan di atas titik
+            transform: "translate(-50%, -130%)",
           }}
         >
-          <p className="text-xs font-medium text-gray-400 mb-1">
+          <p className="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 mb-1 uppercase tracking-wider transition-colors duration-500">
             {formatDateForDisplay(data[hoveredIndex].date)}
           </p>
-          <p className="text-lg font-black flex items-center gap-1">
+          <p className="text-lg font-black flex items-center gap-1 font-mono transition-colors duration-500">
             {data[hoveredIndex].weight}{" "}
-            <span className="text-xs font-normal">kg</span>
+            <span className="text-xs font-normal text-slate-500 dark:text-slate-400 transition-colors duration-500">
+              kg
+            </span>
           </p>
           {data[hoveredIndex].notes && (
-            <p className="text-xs text-gray-300 mt-1 italic border-t border-gray-700 pt-1">
+            <p className="text-xs text-slate-500 dark:text-slate-300 mt-1 italic border-t border-slate-100 dark:border-white/10 pt-1 transition-colors duration-500">
               "{data[hoveredIndex].notes}"
             </p>
           )}
-          {/* Arrow down */}
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-gray-900"></div>
         </div>
       )}
-
-      {/* X-Axis Labels */}
-      <div className="flex justify-between text-xs font-medium text-gray-400 mt-2 px-6">
-        <span>{formatDateForDisplay(data[0].date)}</span>
-        <span>
-          {formatDateForDisplay(data[Math.floor(data.length / 2)].date)}
-        </span>
-        <span>{formatDateForDisplay(data[data.length - 1].date)}</span>
-      </div>
     </div>
   );
 };
 
 const Progress: React.FC = () => {
-  // State Utama
-  const [history, setHistory] = useState(INITIAL_HISTORY);
+  const { t } = useUI();
+  const [history, setHistory] = useState<any[]>([]);
+  const [measurements] = useState<any[]>([]);
+
   const [photos, setPhotos] = useState<{
     before: string | null;
     after: string | null;
   }>({ before: null, after: null });
-
-  // State Modal Log
   const [showLogModal, setShowLogModal] = useState(false);
   const [logForm, setLogForm] = useState({
     date: formatDateForInput(new Date()),
     weight: "",
     notes: "",
   });
-
-  // Refs untuk Input File Foto
   const beforeInputRef = useRef<HTMLInputElement>(null);
   const afterInputRef = useRef<HTMLInputElement>(null);
 
-  // --- LOGIC: Stats Hitungan ---
-  // Sort history berdasarkan tanggal agar kalkulasi dan grafik benar
   const sortedHistory = [...history].sort(
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
   );
-  const startWeight = sortedHistory[0].weight;
-  const currentWeight = sortedHistory[sortedHistory.length - 1].weight;
+  const startWeight = sortedHistory.length > 0 ? sortedHistory[0].weight : 0;
+  const currentWeight =
+    sortedHistory.length > 0
+      ? sortedHistory[sortedHistory.length - 1].weight
+      : 0;
   const totalLoss = (startWeight - currentWeight).toFixed(1);
-  const progressPercent = ((startWeight - currentWeight) / startWeight) * 100;
+  const progressPercent =
+    startWeight > 0 ? ((startWeight - currentWeight) / startWeight) * 100 : 0;
 
-  // --- LOGIC: Handle Log Berat ---
   const handleSaveLog = () => {
     if (!logForm.weight || !logForm.date) {
-      alert("Mohon isi tanggal dan berat badan.");
+      alert("Data incomplete.");
       return;
     }
-
     const newEntry = {
       date: logForm.date,
       weight: parseFloat(logForm.weight),
       notes: logForm.notes,
     };
-
-    // Tambahkan data baru dan sort ulang history berdasarkan tanggal
     setHistory((prev) =>
       [...prev, newEntry].sort(
         (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
       )
     );
-
-    // Reset dan tutup modal
     setShowLogModal(false);
     setLogForm({ date: formatDateForInput(new Date()), weight: "", notes: "" });
   };
 
-  // --- LOGIC: Handle Photo Upload (Base64) ---
   const handlePhotoUpload = (
     type: "before" | "after",
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validasi ukuran (max 2MB)
       if (file.size > 2 * 1024 * 1024) {
-        alert("Ukuran foto terlalu besar! Maksimal 2MB.");
+        alert("Max size 2MB.");
         return;
       }
-
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.onloadend = () =>
         setPhotos((prev) => ({ ...prev, [type]: reader.result as string }));
-      };
       reader.readAsDataURL(file);
     }
   };
 
   const deletePhoto = (type: "before" | "after") => {
-    if (window.confirm(`Hapus foto ${type}?`)) {
+    if (window.confirm(`Delete ${type} photo?`))
       setPhotos((prev) => ({ ...prev, [type]: null }));
-    }
   };
 
   return (
-    <div className="w-full px-6 md:px-12 pb-20 relative">
-      {/* --- HEADER --- */}
-      <div className="flex flex-col md:flex-row justify-between items-end mb-10 pt-4 gap-6">
-        <div>
-          <h1 className="text-4xl font-extrabold text-gray-900 flex items-center gap-3">
-            <span className="p-2.5 bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-2xl shadow-lg shadow-orange-200">
-              <TrendingUp className="w-8 h-8" />
-            </span>
-            Progress Tracker
-          </h1>
-          <p className="text-gray-500 mt-2 ml-1">
-            Pantau transformasi tubuhmu dari waktu ke waktu.
-          </p>
-        </div>
+    <div className="w-full max-w-[1800px] mx-auto px-6 lg:px-10 pb-20 relative overflow-hidden transition-colors duration-500 ease-in-out">
+      <div className="absolute inset-0 -z-10 h-full w-full bg-slate-50 dark:bg-transparent bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none transition-all duration-500 ease-in-out animate-pulse-slow"></div>
 
-        <button
-          onClick={() => setShowLogModal(true)}
-          className="px-5 py-3 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:bg-gray-800 hover:-translate-y-1 transition-all flex items-center gap-2"
-        >
-          <Plus className="w-5 h-5" />
-          <span>Catat Berat Baru</span>
-        </button>
-      </div>
+      <style>{`
+        .animate-pulse-slow { animation: pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        .hover-scan { position: relative; overflow: hidden; }
+        .hover-scan::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 50%;
+          height: 100%;
+          background: linear-gradient(to right, transparent, rgba(15, 23, 42, 0.05), transparent);
+          transform: skewX(-25deg);
+          transition: 0.7s;
+          pointer-events: none;
+          z-index: 20;
+        }
+        .dark .hover-scan::before {
+           background: linear-gradient(to right, transparent, rgba(6, 182, 212, 0.2), transparent);
+        }
+        .hover-scan:hover::before { left: 150%; }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+        .animate-fade-in { animation: fade-in 0.5s ease-out; }
+        .forwards { animation-fill-mode: forwards; }
+      `}</style>
 
-      {/* --- TOP STATS GRID --- */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {/* Card 1: Current Weight */}
-        <div className="bg-white/80 backdrop-blur p-6 rounded-3xl border border-white/60 shadow-sm hover:shadow-md transition-all">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-                Berat Saat Ini
-              </p>
-              <h3 className="text-4xl font-black text-gray-900">
-                {currentWeight}{" "}
-                <span className="text-lg text-gray-400 font-medium">kg</span>
-              </h3>
-              <p className="text-xs text-gray-500 mt-1">
-                per{" "}
-                {formatDateForDisplay(
-                  sortedHistory[sortedHistory.length - 1].date
-                )}
-              </p>
-            </div>
-            <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
-              <Scale className="w-6 h-6" />
-            </div>
-          </div>
-          <div className="mt-4 flex items-center gap-2 text-sm font-medium text-green-600 bg-green-50 px-3 py-1.5 rounded-lg w-fit">
-            <ArrowDown className="w-4 h-4" />
-            <span>Turun {totalLoss} kg total</span>
-          </div>
-        </div>
-
-        {/* Card 2: Progress Percent */}
-        <div className="bg-white/80 backdrop-blur p-6 rounded-3xl border border-white/60 shadow-sm hover:shadow-md transition-all">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-                Pencapaian
-              </p>
-              <h3 className="text-4xl font-black text-gray-900">
-                {progressPercent.toFixed(1)}
-                <span className="text-lg text-gray-400 font-medium">%</span>
-              </h3>
-            </div>
-            <div className="p-3 bg-green-50 text-green-600 rounded-xl">
-              <TrendingUp className="w-6 h-6" />
-            </div>
-          </div>
-          <div className="mt-4 w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-green-500 rounded-full transition-all duration-1000"
-              style={{ width: `${Math.min(100, progressPercent * 5)}%` }}
-            ></div>
-          </div>
-          <p className="text-xs text-gray-400 mt-2">Menuju target idealmu</p>
-        </div>
-
-        {/* Card 3: Streak / Entries */}
-        <div className="bg-white/80 backdrop-blur p-6 rounded-3xl border border-white/60 shadow-sm hover:shadow-md transition-all">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-                Total Entri Log
-              </p>
-              <h3 className="text-4xl font-black text-gray-900">
-                {history.length}{" "}
-                <span className="text-lg text-gray-400 font-medium">kali</span>
-              </h3>
-            </div>
-            <div className="p-3 bg-orange-50 text-orange-600 rounded-xl">
-              <Calendar className="w-6 h-6" />
-            </div>
-          </div>
-          <p className="text-sm text-gray-500 mt-4 font-medium">
-            Konsistensi adalah kunci!
-          </p>
-        </div>
-      </div>
-
-      {/* --- MAIN CONTENT GRID --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* LEFT COLUMN: CHART & MEASUREMENTS */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* IMPROVED CHART SECTION */}
-          <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 relative overflow-hidden group">
-            <div className="flex justify-between items-center mb-8">
-              <div>
-                <h3 className="font-bold text-xl text-gray-800">
-                  Grafik Berat Badan
-                </h3>
-                <p className="text-sm text-gray-500">
-                  Tren penurunan berat badanmu.
-                </p>
-              </div>
-              <select className="bg-gray-50 border border-gray-200 text-gray-600 text-sm font-medium rounded-xl px-4 py-2 focus:outline-none hover:bg-gray-100 transition-colors cursor-pointer">
-                <option>Semua Waktu</option>
-                <option>30 Hari Terakhir</option>
-              </select>
-            </div>
-
-            {/* Advanced Custom Chart Component */}
-            <div className="h-72 w-full">
-              <AdvancedLineChart data={sortedHistory} />
-            </div>
-          </div>
-
-          {/* MEASUREMENTS GRID */}
+      <div className="animate-enter transform-gpu">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-10 pt-4 gap-6">
           <div>
-            <h3 className="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
-              Ukuran Tubuh (Cm)
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {INITIAL_MEASUREMENTS.map((m, idx) => (
-                <div
-                  key={idx}
-                  className="bg-white/70 backdrop-blur p-5 rounded-2xl border border-white/60 shadow-sm flex flex-col justify-between hover:border-blue-100 transition-colors"
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`w-2.5 h-10 rounded-full ${m.color} opacity-80`}
-                      ></div>
-                      <div>
-                        <span className="font-bold text-gray-700 block">
-                          {m.part}
-                        </span>
-                        <span className="text-xs text-gray-400">
-                          Awal: {m.start}
-                          {m.unit}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-end gap-2 mt-3 pl-5">
-                    <span className="text-3xl font-black text-gray-900">
-                      {m.current}
-                    </span>
-                    <span className="text-sm text-gray-500 font-bold mb-1">
-                      {m.unit}
-                    </span>
-
-                    {m.start - m.current > 0 && (
-                      <span className="ml-auto text-xs font-bold text-green-600 flex items-center bg-green-100 px-2.5 py-1 rounded-lg">
-                        <ArrowDown className="w-3 h-3 mr-0.5" />
-                        {m.start - m.current} cm
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white flex items-center gap-3 transition-colors duration-500 ease-in-out">
+              <div className="relative p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-cyan-500/30 shadow-sm dark:shadow-none transition-all duration-500 hover:scale-105 group overflow-hidden">
+                <div className="absolute inset-0 bg-blue-50 dark:bg-blue-500/10 animate-pulse transition-colors duration-500"></div>
+                <Activity className="w-8 h-8 text-blue-600 dark:text-blue-400 relative z-10 transition-colors duration-500" />
+              </div>
+              {t("progress.title")}
+            </h1>
+            <p className="text-slate-500 dark:text-slate-400 mt-2 ml-1 flex items-center gap-2 transition-colors duration-500">
+              <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+              {t("progress.subtitle")}
+            </p>
           </div>
+
+          <button
+            onClick={() => setShowLogModal(true)}
+            className="group relative px-5 py-3 bg-slate-900 dark:bg-cyan-600 text-white font-bold rounded-xl shadow-lg hover:shadow-cyan-500/30 hover:-translate-y-1 transition-all duration-500 flex items-center gap-2 overflow-hidden font-mono"
+          >
+            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+            <Plus className="w-5 h-5 relative z-10" />
+            <span className="relative z-10">{t("progress.log_btn")}</span>
+          </button>
         </div>
 
-        {/* RIGHT COLUMN: PHOTO & HISTORY */}
-        <div className="space-y-8">
-          {/* FUNCTIONAL BEFORE / AFTER PHOTO CARD */}
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 text-white p-6 rounded-3xl shadow-xl relative overflow-hidden group">
-            {/* Background Blob */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl -mr-20 -mt-20 group-hover:scale-125 transition-transform duration-700"></div>
-
-            <div className="relative z-10">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="font-bold text-lg flex items-center gap-2">
-                  <Camera className="w-6 h-6 text-orange-400" />
-                  Transformation
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/80 backdrop-blur shadow-md dark:shadow-sm hover:shadow-xl transition-all duration-500 group relative overflow-hidden hover-scan">
+            <div className="absolute -right-10 -top-10 w-32 h-32 bg-cyan-100 dark:bg-cyan-500/10 rounded-full blur-2xl group-hover:scale-150 transition-all duration-500 opacity-70 dark:opacity-100"></div>
+            <div className="flex justify-between items-start mb-4 relative z-10">
+              <div>
+                <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1 transition-colors duration-500">
+                  {t("progress.current_weight")}
+                </p>
+                <h3 className="text-4xl font-black text-slate-900 dark:text-white font-mono transition-colors duration-500">
+                  {currentWeight}{" "}
+                  <span className="text-lg text-slate-400 font-medium">kg</span>
                 </h3>
-                <span className="text-xs bg-white/10 px-3 py-1 rounded-full text-orange-200 font-medium">
-                  Visual Progress
-                </span>
               </div>
-
-              <div className="flex gap-3 h-56 md:h-48 lg:h-56">
-                {/* BEFORE PHOTO UPLOAD/DISPLAY */}
-                <div
-                  onClick={() =>
-                    !photos.before && beforeInputRef.current?.click()
-                  }
-                  className={`flex-1 relative rounded-2xl overflow-hidden border-2 ${
-                    photos.before
-                      ? "border-transparent"
-                      : "border-dashed border-white/20 hover:bg-white/10 hover:border-white/40"
-                  } transition-all cursor-pointer group/photo`}
-                >
-                  {photos.before ? (
-                    <>
-                      <img
-                        src={photos.before}
-                        alt="Before"
-                        className="w-full h-full object-cover"
-                      />
-                      <span className="absolute top-2 left-2 bg-black/60 backdrop-blur px-2 py-1 rounded-md text-xs font-bold">
-                        Before
-                      </span>
-                      {/* Delete Button */}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deletePhoto("before");
-                        }}
-                        className="absolute top-2 right-2 p-1.5 bg-red-500/80 rounded-full opacity-0 group-hover/photo:opacity-100 transition-opacity hover:bg-red-600"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </>
-                  ) : (
-                    <div className="h-full flex flex-col items-center justify-center text-gray-400">
-                      <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mb-3">
-                        <UploadCloud className="w-6 h-6" />
-                      </div>
-                      <span className="text-sm font-bold text-gray-300">
-                        Upload Before
-                      </span>
-                      <span className="text-xs opacity-60 mt-1">Max 2MB</span>
-                    </div>
-                  )}
-                  <input
-                    type="file"
-                    ref={beforeInputRef}
-                    onChange={(e) => handlePhotoUpload("before", e)}
-                    accept="image/*"
-                    className="hidden"
-                  />
-                </div>
-
-                {/* Arrow Connector */}
-                <div className="flex items-center justify-center">
-                  <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-orange-600 shadow-lg z-20 relative">
-                    <ChevronDown className="w-5 h-5 -rotate-90" />
-                    <div className="absolute inset-0 bg-orange-200 rounded-full animate-ping opacity-30"></div>
-                  </div>
-                </div>
-
-                {/* AFTER PHOTO UPLOAD/DISPLAY */}
-                <div
-                  onClick={() =>
-                    !photos.after && afterInputRef.current?.click()
-                  }
-                  className={`flex-1 relative rounded-2xl overflow-hidden border-2 ${
-                    photos.after
-                      ? "border-transparent"
-                      : "border-dashed border-white/20 hover:bg-white/10 hover:border-white/40"
-                  } transition-all cursor-pointer group/photo`}
-                >
-                  {photos.after ? (
-                    <>
-                      <img
-                        src={photos.after}
-                        alt="After"
-                        className="w-full h-full object-cover"
-                      />
-                      <span className="absolute top-2 left-2 bg-green-500/80 backdrop-blur px-2 py-1 rounded-md text-xs font-bold">
-                        Now
-                      </span>
-                      {/* Delete Button */}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deletePhoto("after");
-                        }}
-                        className="absolute top-2 right-2 p-1.5 bg-red-500/80 rounded-full opacity-0 group-hover/photo:opacity-100 transition-opacity hover:bg-red-600"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </>
-                  ) : (
-                    <div className="h-full flex flex-col items-center justify-center text-gray-400">
-                      <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mb-3">
-                        <UploadCloud className="w-6 h-6" />
-                      </div>
-                      <span className="text-sm font-bold text-gray-300">
-                        Upload After
-                      </span>
-                      <span className="text-xs opacity-60 mt-1">Max 2MB</span>
-                    </div>
-                  )}
-                  <input
-                    type="file"
-                    ref={afterInputRef}
-                    onChange={(e) => handlePhotoUpload("after", e)}
-                    accept="image/*"
-                    className="hidden"
-                  />
-                </div>
-              </div>
-
-              <button className="w-full mt-6 py-3.5 bg-white text-gray-900 font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors shadow-lg">
-                <Share2 className="w-5 h-5" />
-                Bagikan Pencapaian
-              </button>
-            </div>
-          </div>
-
-          {/* RECENT HISTORY LIST (Sorted Descending) */}
-          <div className="bg-white/80 backdrop-blur-md border border-white/60 p-6 rounded-3xl shadow-sm max-h-[400px] overflow-y-auto custom-scrollbar">
-            <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 sticky top-0 bg-white/80 backdrop-blur py-2 z-10">
-              <History className="w-5 h-5 text-gray-400" />
-              Riwayat Log
-            </h3>
-            <div className="space-y-3">
-              {[...sortedHistory].reverse().map((log, idx) => (
-                <div
-                  key={idx}
-                  className="flex flex-col p-3 border border-gray-100 bg-white rounded-xl hover:border-orange-200 transition-colors"
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-bold text-gray-700 flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-gray-400" />
-                      {formatDateForDisplay(log.date)}
-                    </span>
-                    <span className="font-black text-lg text-gray-900">
-                      {log.weight}{" "}
-                      <span className="text-xs font-normal text-gray-500">
-                        kg
-                      </span>
-                    </span>
-                  </div>
-                  {log.notes && (
-                    <div className="mt-2 flex items-start gap-2 text-xs text-gray-500 bg-gray-50 p-2 rounded-lg">
-                      <FileText className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                      <p className="italic">"{log.notes}"</p>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* --- COMPLEX LOG WEIGHT MODAL --- */}
-      {showLogModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in-up">
-          <div className="bg-white rounded-[2rem] w-full max-w-md p-8 shadow-2xl relative">
-            <button
-              onClick={() => setShowLogModal(false)}
-              className="absolute top-5 right-5 p-2 text-gray-400 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <X className="w-6 h-6" />
-            </button>
-
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-3 bg-orange-100 text-orange-600 rounded-2xl">
+              <div className="p-3 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 rounded-xl border border-cyan-100 dark:border-cyan-500/20 group-hover:rotate-12 transition-all duration-500">
                 <Scale className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-black text-gray-900">Catat Berat</h3>
             </div>
-            <p className="text-gray-500 mb-8 ml-1">
-              Update progress terbarumu.
-            </p>
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-emerald-400 bg-slate-100 dark:bg-emerald-900/20 px-3 py-1.5 rounded-lg w-fit border border-slate-200 dark:border-emerald-500/20 transition-all duration-500">
+              <ArrowDown className="w-3 h-3 animate-bounce text-emerald-500" />{" "}
+              {t("progress.total_loss")} {totalLoss} kg
+            </div>
+          </div>
 
-            <div className="space-y-6">
-              {/* Input Tanggal */}
+          <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/80 backdrop-blur shadow-md dark:shadow-sm hover:shadow-xl transition-all duration-500 group relative overflow-hidden hover-scan">
+            <div className="absolute -right-10 -top-10 w-32 h-32 bg-emerald-100 dark:bg-emerald-500/10 rounded-full blur-2xl group-hover:scale-150 transition-all duration-500 opacity-70 dark:opacity-100"></div>
+            <div className="flex justify-between items-start mb-4 relative z-10">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">
-                  Tanggal
-                </label>
-                <div className="relative">
-                  <input
-                    type="date"
-                    value={logForm.date}
-                    onChange={(e) =>
-                      setLogForm({ ...logForm, date: e.target.value })
-                    }
-                    className="w-full p-4 pl-12 bg-gray-50 rounded-2xl font-medium text-gray-800 focus:bg-white focus:ring-2 focus:ring-orange-500 outline-none transition-all"
-                    max={formatDateForInput(new Date())} // Tidak bisa pilih tanggal masa depan
-                  />
-                  <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1 transition-colors duration-500">
+                  {t("progress.achievement")}
+                </p>
+                <h3 className="text-4xl font-black text-slate-900 dark:text-white font-mono transition-colors duration-500">
+                  {progressPercent.toFixed(1)}{" "}
+                  <span className="text-lg text-slate-400 font-medium">%</span>
+                </h3>
+              </div>
+              <div className="p-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-100 dark:border-emerald-500/20 group-hover:rotate-12 transition-all duration-500">
+                <Target className="w-6 h-6" />
+              </div>
+            </div>
+            <div className="w-full bg-slate-100 dark:bg-white/10 h-2 rounded-full overflow-hidden border border-slate-100 dark:border-transparent transition-colors duration-500">
+              <div
+                className="h-full bg-emerald-500 rounded-full transition-all duration-1000 shadow-[0_0_10px_#10b981] relative overflow-hidden"
+                style={{ width: `${Math.min(100, progressPercent * 5)}%` }}
+              >
+                <div className="absolute inset-0 bg-white/30 animate-[shine_2s_infinite]"></div>
+              </div>
+            </div>
+          </div>
+
+          <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-white/5 bg-white/40 dark:bg-slate-900/80 backdrop-blur shadow-md dark:shadow-sm hover:shadow-xl transition-all duration-500 ease-in-out group relative overflow-hidden hover-scan">
+            <div className="absolute -right-10 -top-10 w-32 h-32 bg-orange-100 dark:bg-orange-500/10 rounded-full blur-2xl group-hover:scale-150 transition-all duration-500 opacity-70 dark:opacity-100"></div>
+            <div className="flex justify-between items-start mb-4 relative z-10">
+              <div>
+                <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1 transition-colors duration-500">
+                  {t("progress.total_entries")}
+                </p>
+                <h3 className="text-4xl font-black text-slate-900 dark:text-white font-mono transition-colors duration-500">
+                  {history.length}{" "}
+                  <span className="text-lg text-slate-400 font-medium">x</span>
+                </h3>
+              </div>
+              <div className="p-3 bg-orange-50 dark:bg-orange-100/10 text-orange-600 dark:text-orange-400 rounded-xl border border-orange-100 dark:border-orange-500/20 group-hover:rotate-12 transition-all duration-500">
+                <History className="w-6 h-6" />
+              </div>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium transition-colors duration-500">
+              Konsistensi adalah kunci!
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-8">
+            <div className="glass-panel p-6 md:p-8 rounded-[2.5rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900 shadow-lg dark:shadow-sm relative overflow-hidden group hover-scan transition-all duration-500">
+              <div className="flex justify-between items-center mb-8 relative z-10">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300 transition-colors duration-500">
+                    <BarChart3 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-slate-900 dark:text-white transition-colors duration-500">
+                      {t("progress.chart.weight")}
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 transition-colors duration-500">
+                      Visualisasi data biometrik.
+                    </p>
+                  </div>
                 </div>
               </div>
+              <div className="h-72 w-full relative z-10">
+                <RoboticLineChart data={sortedHistory} />
+              </div>
+            </div>
 
-              {/* Input Berat */}
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">
-                  Berat Badan (kg)
-                </label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    value={logForm.weight}
-                    onChange={(e) =>
-                      setLogForm({ ...logForm, weight: e.target.value })
-                    }
-                    placeholder="Contoh: 75.5"
-                    className="w-full p-4 pl-12 bg-gray-50 rounded-2xl font-black text-2xl text-gray-900 focus:bg-white focus:ring-2 focus:ring-orange-500 outline-none transition-all placeholder:text-gray-300"
-                    step="0.1"
-                    autoFocus
-                  />
-                  <Scale className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400 pointer-events-none" />
-                  <span className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-lg pointer-events-none">
-                    kg
+            <div>
+              <div className="flex items-center gap-3 mb-4 px-2">
+                <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300 transition-colors duration-500">
+                  <Ruler className="w-5 h-5" />
+                </div>
+                <h3 className="font-bold text-lg text-slate-900 dark:text-white transition-colors duration-500">
+                  {t("progress.chart.measurements")}
+                </h3>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {measurements.length > 0 ? (
+                measurements.map((m, idx) => (
+                  <div
+                    key={idx}
+                    className={`bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-white/5 shadow-md dark:shadow-sm flex flex-col justify-between hover:border-slate-300 dark:hover:border-white/10 transition-all duration-500 group hover:-translate-y-1 hover-scan`}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`hidden dark:block w-1 h-8 rounded-full ${m.barColor} transition-colors duration-500`}
+                        ></div>
+                        <div>
+                          <span className="font-bold text-slate-700 dark:text-slate-200 block text-sm transition-colors duration-500">
+                            {m.part}
+                          </span>
+                          <span className="text-[10px] text-slate-400 transition-colors duration-500">
+                            Start: {m.start} {m.unit}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-end gap-2 mt-3 pl-1 dark:pl-4 transition-all duration-500">
+                      <span
+                        className={`text-3xl font-black ${m.color} font-mono transition-colors duration-500`}
+                      >
+                        {m.current}
+                      </span>
+                      <span className="text-xs text-slate-500 font-bold mb-1 transition-colors duration-500">
+                        {m.unit}
+                      </span>
+                      {m.start - m.current > 0 && (
+                        <span className="ml-auto text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded flex items-center border border-emerald-100 dark:border-emerald-500/20 transition-all duration-500">
+                          <ArrowDown className="w-3 h-3 mr-0.5" />{" "}
+                          {m.start - m.current}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-full py-10 text-center text-slate-400 text-sm font-mono border-2 border-dashed border-slate-200 dark:border-white/5 rounded-2xl">
+                  NO MEASUREMENT DATA
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-8">
+            <div className="glass-panel p-6 rounded-[2.5rem] border border-slate-800 bg-slate-900 text-white shadow-xl relative overflow-hidden group hover-scan transition-all duration-500">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-cyan-900/30 via-transparent to-transparent opacity-50 transition-opacity duration-500"></div>
+              <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl -mr-20 -mt-20 group-hover:scale-125 transition-transform duration-700"></div>
+
+              <div className="relative z-10">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="font-bold text-lg flex items-center gap-2 text-white transition-colors duration-500">
+                    <ScanLine className="w-5 h-5 text-cyan-400 animate-pulse" />{" "}
+                    Transformasi
+                  </h3>
+                  <span className="text-[10px] bg-white/10 px-2 py-1 rounded text-cyan-200 font-medium border border-white/10 font-mono tracking-wider transition-colors duration-500">
+                    VISUAL DATA
                   </span>
                 </div>
-              </div>
 
-              {/* Input Catatan */}
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">
-                  Catatan (Opsional)
-                </label>
-                <textarea
-                  value={logForm.notes}
-                  onChange={(e) =>
-                    setLogForm({ ...logForm, notes: e.target.value })
-                  }
-                  placeholder="Contoh: Merasa lebih energik hari ini..."
-                  className="w-full p-4 bg-gray-50 rounded-2xl font-medium text-gray-800 focus:bg-white focus:ring-2 focus:ring-orange-500 outline-none transition-all resize-none h-24"
-                ></textarea>
-              </div>
+                <div className="flex gap-3 h-48">
+                  <div
+                    onClick={() =>
+                      !photos.before && beforeInputRef.current?.click()
+                    }
+                    className={`flex-1 relative rounded-2xl overflow-hidden border-2 ${
+                      photos.before
+                        ? "border-transparent"
+                        : "border-dashed border-white/20 hover:bg-white/5 hover:border-cyan-400/50"
+                    } transition-all duration-500 cursor-pointer group/photo`}
+                  >
+                    {photos.before ? (
+                      <>
+                        <img
+                          src={photos.before}
+                          alt="Before"
+                          className="w-full h-full object-cover group-hover/photo:scale-110 transition-transform duration-500"
+                        />
+                        <span className="absolute top-2 left-2 bg-black/60 backdrop-blur px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-white">
+                          Before
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deletePhoto("before");
+                          }}
+                          className="absolute top-2 right-2 p-1.5 bg-red-500/80 rounded-full opacity-0 group-hover/photo:opacity-100 hover:bg-red-600 transition-all"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </>
+                    ) : (
+                      <div className="h-full flex flex-col items-center justify-center text-slate-400 group-hover/photo:text-cyan-400 transition-colors duration-500">
+                        <UploadCloud className="w-8 h-8 mb-2 opacity-50 group-hover/photo:scale-110 transition-transform" />
+                        <span className="text-xs font-bold font-mono">
+                          {t("progress.upload.before")}
+                        </span>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      ref={beforeInputRef}
+                      onChange={(e) => handlePhotoUpload("before", e)}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                  </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-4 pt-4">
-                <button
-                  onClick={() => setShowLogModal(false)}
-                  className="flex-1 py-4 text-gray-600 font-bold bg-gray-100 hover:bg-gray-200 rounded-2xl transition-colors"
-                >
-                  Batal
-                </button>
-                <button
-                  onClick={handleSaveLog}
-                  className="flex-1 py-4 text-white font-bold bg-gray-900 hover:bg-gray-800 rounded-2xl shadow-xl shadow-gray-200 transition-all flex items-center justify-center gap-2 hover:-translate-y-1"
-                >
-                  <Save className="w-5 h-5" />
-                  Simpan Log
+                  <div
+                    onClick={() =>
+                      !photos.after && afterInputRef.current?.click()
+                    }
+                    className={`flex-1 relative rounded-2xl overflow-hidden border-2 ${
+                      photos.after
+                        ? "border-transparent"
+                        : "border-dashed border-white/20 hover:bg-white/5 hover:border-emerald-400/50"
+                    } transition-all duration-500 cursor-pointer group/photo`}
+                  >
+                    {photos.after ? (
+                      <>
+                        <img
+                          src={photos.after}
+                          alt="After"
+                          className="w-full h-full object-cover group-hover/photo:scale-110 transition-transform duration-500"
+                        />
+                        <span className="absolute top-2 left-2 bg-emerald-600/80 backdrop-blur px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-white">
+                          Now
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deletePhoto("after");
+                          }}
+                          className="absolute top-2 right-2 p-1.5 bg-red-500/80 rounded-full opacity-0 group-hover/photo:opacity-100 hover:bg-red-600 transition-all"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </>
+                    ) : (
+                      <div className="h-full flex flex-col items-center justify-center text-slate-400 group-hover/photo:text-emerald-400 transition-colors duration-500">
+                        <UploadCloud className="w-8 h-8 mb-2 opacity-50 group-hover/photo:scale-110 transition-transform" />
+                        <span className="text-xs font-bold font-mono">
+                          {t("progress.upload.after")}
+                        </span>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      ref={afterInputRef}
+                      onChange={(e) => handlePhotoUpload("after", e)}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                  </div>
+                </div>
+
+                <button className="w-full mt-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all duration-500 shadow-lg shadow-cyan-500/20 hover:-translate-y-1 group/btn overflow-hidden relative font-mono">
+                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></div>
+                  <Share2 className="w-4 h-4 relative z-10" />{" "}
+                  <span className="relative z-10">{t("progress.share")}</span>
                 </button>
               </div>
             </div>
           </div>
         </div>
-      )}
+
+        {showLogModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 animate-fade-in-up font-mono transition-all duration-500">
+            <div className="bg-white dark:bg-slate-900 rounded-[2rem] w-full max-w-md p-8 shadow-2xl relative border border-slate-200 dark:border-cyan-500/30 overflow-hidden transition-all duration-500">
+              <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(to_bottom,transparent,rgba(6,182,212,0.05),transparent)] bg-[size:100%_3px] animate-scan"></div>
+
+              <button
+                onClick={() => setShowLogModal(false)}
+                className="absolute top-5 right-5 p-2 text-slate-400 hover:text-red-500 transition-colors duration-300 z-10"
+              >
+                <X className="w-6 h-6" />
+              </button>
+
+              <div className="flex items-center gap-3 mb-2 relative z-10">
+                <div className="p-3 bg-cyan-100 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 rounded-2xl border border-cyan-200 dark:border-cyan-500/30 transition-all duration-500">
+                  <Scale className="w-6 h-6 animate-pulse" />
+                </div>
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight transition-colors duration-500">
+                  {t("progress.modal.title")}
+                </h3>
+              </div>
+              <p className="text-slate-500 dark:text-slate-400 mb-8 ml-1 text-sm relative z-10 transition-colors duration-500">
+                Update parameter data terbaru.
+              </p>
+
+              <div className="space-y-6 relative z-10">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1 transition-colors duration-500">
+                    {t("progress.modal.date")}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      value={logForm.date}
+                      onChange={(e) =>
+                        setLogForm({ ...logForm, date: e.target.value })
+                      }
+                      className="w-full p-4 pl-12 bg-slate-50 dark:bg-slate-800 rounded-2xl font-medium text-slate-800 dark:text-white focus:ring-2 focus:ring-cyan-500 outline-none transition-all duration-500 border border-slate-200 dark:border-white/5"
+                      max={formatDateForInput(new Date())}
+                    />
+                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1 transition-colors duration-500">
+                    {t("progress.modal.weight")}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      value={logForm.weight}
+                      onChange={(e) =>
+                        setLogForm({ ...logForm, weight: e.target.value })
+                      }
+                      placeholder="0.0"
+                      className="w-full p-4 pl-12 bg-slate-50 dark:bg-slate-800 rounded-2xl font-black text-2xl text-slate-900 dark:text-white focus:ring-2 focus:ring-cyan-500 outline-none transition-all duration-500 border border-slate-200 dark:border-white/5 placeholder:text-slate-600"
+                      step="0.1"
+                      autoFocus
+                    />
+                    <Scale className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 pointer-events-none" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1 transition-colors duration-500">
+                    {t("progress.modal.notes")}
+                  </label>
+                  <textarea
+                    value={logForm.notes}
+                    onChange={(e) =>
+                      setLogForm({ ...logForm, notes: e.target.value })
+                    }
+                    placeholder="Kondisi fisik, energi, dll..."
+                    className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl font-medium text-slate-800 dark:text-white focus:ring-2 focus:ring-cyan-500 outline-none transition-all duration-500 resize-none h-24 border border-slate-200 dark:border-white/5 text-sm"
+                  ></textarea>
+                </div>
+                <div className="flex gap-4 pt-4">
+                  <button
+                    onClick={() => setShowLogModal(false)}
+                    className="flex-1 py-4 text-slate-600 dark:text-slate-400 font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-2xl transition-colors duration-500 text-sm"
+                  >
+                    {t("progress.modal.cancel")}
+                  </button>
+                  <button
+                    onClick={handleSaveLog}
+                    className="flex-1 py-4 text-white font-bold bg-cyan-600 hover:bg-cyan-500 rounded-2xl shadow-lg shadow-cyan-500/30 transition-all duration-500 flex items-center justify-center gap-2 hover:-translate-y-1 text-sm group relative overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                    <Save className="w-4 h-4 relative z-10" />{" "}
+                    <span className="relative z-10">
+                      {t("progress.modal.save")}
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

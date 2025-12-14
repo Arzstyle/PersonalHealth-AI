@@ -1,3 +1,20 @@
+
+
+
+* {
+  
+  transition-property: color, background-color, border-color,
+    text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter,
+    backdrop-filter;
+  
+  transition-duration: 500ms;
+  
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -11,7 +28,7 @@
   }
 }
 
-/* --- SCROLLBAR --- */
+
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -25,9 +42,9 @@
   @apply bg-slate-400 dark:bg-slate-700;
 }
 
-/* --- ADVANCED ANIMATIONS (The Living UI) --- */
 
-/* 1. Staggered Entrance (Muncul bertahap) */
+
+
 @keyframes fadeSlideUp {
   0% {
     opacity: 0;
@@ -42,7 +59,7 @@
   animation: fadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
-/* Delays agar animasi berurutan */
+
 .delay-100 {
   animation-delay: 100ms;
 }
@@ -56,7 +73,7 @@
   animation-delay: 500ms;
 }
 
-/* 2. Aurora Text & Background Flow */
+
 @keyframes aurora {
   0% {
     background-position: 0% 50%;
@@ -72,7 +89,7 @@
   animation: aurora 10s ease infinite;
 }
 
-/* 3. Floating Mesh Blobs (Background bergerak) */
+
 @keyframes meshFlow {
   0% {
     transform: translate(0, 0) rotate(0deg);
@@ -91,7 +108,7 @@
   animation: meshFlow 20s ease-in-out infinite alternate;
 }
 
-/* 4. Shine Effect (Kilatan cahaya) */
+
 @keyframes shine {
   from {
     transform: translateX(-100%);
@@ -101,12 +118,9 @@
   }
 }
 
-/* --- COMPONENT CLASSES --- */
 
-/* PREMIUM GLASS CARD (Fix Light Mode Visibility) 
-   - Light Mode: Shadow lebih tebal, border putih solid + border ring halus.
-   - Dark Mode: Border tipis bercahaya.
-*/
+
+
 .glass-panel {
   @apply bg-white/80 dark:bg-[#0F172A]/70 
          backdrop-blur-2xl 
@@ -116,7 +130,7 @@
          transition-all duration-500 ease-out;
 }
 
-/* Hover Effect: Lift Up & Glow */
+
 .glass-panel:hover {
   @apply -translate-y-2 scale-[1.01]
          shadow-[0_20px_40px_rgb(0,0,0,0.12)] dark:shadow-emerald-900/20
@@ -129,7 +143,7 @@
 }
 
 @layer utilities {
-  /* Animasi gerakan lambat tak berujung */
+  
   @keyframes blob {
     0% {
       transform: translate(0px, 0px) scale(1);
@@ -145,7 +159,7 @@
     }
   }
 
-  /* Animasi rotasi lambat */
+  
   @keyframes slow-spin {
     from {
       transform: rotate(0deg);
@@ -155,7 +169,7 @@
     }
   }
 
-  /* Kelas utilitas untuk menggunakan animasi di atas */
+  
   .animate-blob {
     animation: blob 15s infinite;
   }
@@ -163,7 +177,7 @@
     animation: slow-spin 30s linear infinite;
   }
 
-  /* Delay agar gerakan tidak seragam */
+  
   .animation-delay-2000 {
     animation-delay: 2s;
   }

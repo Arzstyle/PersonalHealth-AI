@@ -19,7 +19,7 @@ interface UIContextType {
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
-    // --- GENERAL / LANDING PAGE ---
+    
     "hero.tagline": "INTELLIGENT HEALTH ECOSYSTEM",
     "hero.title": "PERSONAL HEALTH AI",
     "hero.subtitle": "YOUR SMART WELLNESS COMPANION.",
@@ -47,7 +47,7 @@ const translations: Record<Language, Record<string, string>> = {
       "Your personal AI health assistant is ready. Start your evolution today.",
     "btn.free": "TRY FOR FREE",
 
-    // --- AUTH & ONBOARDING ---
+    
     "welcome.slide1.title": "AI Neural Analysis",
     "welcome.slide1.desc":
       "Our engine scans your bio-markers to calculate the perfect metabolic baseline.",
@@ -85,7 +85,7 @@ const translations: Record<Language, Record<string, string>> = {
     "auth.error.generic": "Authentication Failed. Retry.",
     "auth.success": "Access Granted. Redirecting...",
 
-    // --- PROFILE SETUP ---
+    
     "profile.setup.title.step1": "Body Metrics",
     "profile.setup.desc.step1": "Let's start by calculating your BMI.",
     "profile.setup.label.height": "Height (cm)",
@@ -113,7 +113,7 @@ const translations: Record<Language, Record<string, string>> = {
     "profile.setup.btn.back": "Back",
     "profile.setup.btn.finish": "Calculate & Finish",
 
-    // --- DASHBOARD (FIXED KEYS) ---
+    
     "dash.welcome": "Welcome Back,",
     "dash.hello": "Hello,",
     "dash.today_overview": "Today's Overview",
@@ -137,9 +137,116 @@ const translations: Record<Language, Record<string, string>> = {
     "dash.act_ai_scan": "AI Scan",
     "dash.desc_ai_scan": "Analyze food",
     "dash.weekly_activity": "Weekly Activity",
+
+    
+    "meal.plan_title": "Meal Plan",
+    "meal.plan_subtitle": "Plan your nutrition, auto or manual.",
+    "meal.summary_title": "Nutrition Summary (Planned)",
+    "meal.target": "Target",
+    "meal.select_goal": "Select Diet Goal:",
+    "meal.auto": "Automatic",
+    "meal.manual": "Manual",
+    "meal.ai_generate": "AI Auto-Generate",
+    "meal.ai_desc": "Let the AI create a complete daily menu for you.",
+    "meal.manual_title": "Manual Setup",
+    "meal.manual_desc": "Choose your meals manually through AI search.",
+    "meal.generating": "Generating Menu...",
+    "meal.items": "Items",
+    "meal.add": "Add",
+    "meal.remove": "Remove",
+    "meal.empty": "Empty",
+    "meal.add_manual": "Add Manually",
+    "meal.breakfast": "Breakfast",
+    "meal.lunch": "Lunch",
+    "meal.dinner": "Dinner",
+    "meal.snacks": "Snacks",
+    "meal.calories": "Calories",
+    "meal.protein": "Protein",
+    "meal.carbs": "Carbs",
+    "meal.fat": "Fat",
+    "goal.low-cal": "Low Calorie",
+    "goal.standard": "Standard",
+    "goal.bulking": "Bulking",
+
+    
+    "search.title": "NEURAL FOOD SEARCH",
+    "search.subtitle": "AI-Powered Nutritional Analysis",
+    "search.placeholder": "Enter food name to search...",
+    "search.button": "SEARCH",
+    "search.results": "SEARCH RESULTS",
+    "search.items_found": "ITEMS FOUND",
+    "search.scanning": "AI WEB SCANNING...",
+    "search.processing": "Processing global nutritional data via AI...",
+    "search.ready": "Ready to Search",
+    "search.ready_desc":
+      "Input food name to find nutritional values locally & globally.",
+    "search.add_to_menu": "ADD TO MENU",
+
+    
+    "exercise.title": "WORKOUT PROTOCOL",
+    "exercise.subtitle": "AI-Generated Fitness Roadmap",
+    "exercise.generate": "GENERATE NEW PLAN",
+    "exercise.tab.home": "HOME WORKOUT",
+    "exercise.tab.gym": "GYM TRAINING",
+    "exercise.tab.cardio": "CARDIO",
+    "exercise.sets": "SETS",
+    "exercise.reps": "REPS",
+    "exercise.rest": "REST",
+    "exercise.min": "MIN",
+
+    
+    "progress.title": "PROGRESS TRACKER",
+    "progress.subtitle": "Monitor your body transformation.",
+    "progress.log_btn": "LOG NEW DATA",
+    "progress.current_weight": "CURRENT WEIGHT",
+    "progress.total_loss": "TOTAL LOSS",
+    "progress.achievement": "ACHIEVEMENT",
+    "progress.total_entries": "TOTAL ENTRIES",
+    "progress.chart.weight": "WEIGHT CHART",
+    "progress.chart.measurements": "BODY MEASUREMENTS",
+    "progress.upload.before": "UPLOAD BEFORE",
+    "progress.upload.after": "UPLOAD AFTER",
+    "progress.share": "SHARE PROGRESS",
+    "progress.modal.title": "INPUT BIOMETRICS",
+    "progress.modal.date": "RECORD DATE",
+    "progress.modal.weight": "WEIGHT (KG)",
+    "progress.modal.notes": "ADDITIONAL NOTES",
+    "progress.modal.cancel": "CANCEL",
+    "progress.modal.save": "SAVE DATA",
+
+    
+    "profile.title": "OPERATOR PROFILE",
+    "profile.subtitle": "Manage identity & system preferences.",
+    "profile.edit": "EDIT PROFILE",
+    "profile.disconnect": "DISCONNECT",
+    "profile.joined": "JOINED",
+    "profile.status": "SYSTEM STATUS",
+    "profile.online": "ONLINE",
+    "profile.target_ops": "TARGET & OPERATIONS",
+    "profile.nutrition_proto": "NUTRITIONAL PROTOCOLS",
+    "profile.restrictions": "RESTRICTIONS",
+    "profile.allergies": "ALLERGIES",
+    "profile.no_restrictions": "No restrictions detected.",
+    "profile.no_allergies": "No allergies detected.",
+    "profile.tap_update": "TAP TO UPDATE VISUAL ID",
+    "profile.modal.identity": "EDIT IDENTITY",
+    "profile.modal.objectives": "EDIT OBJECTIVES",
+    "profile.modal.protocols": "EDIT PROTOCOLS",
+    "profile.label.height": "HEIGHT",
+    "profile.label.weight": "WEIGHT",
+    "profile.label.age": "AGE",
+    "profile.label.bmi": "BMI",
+    "profile.form.fullname": "FULL NAME",
+    "profile.form.email": "EMAIL",
+    "profile.form.target_main": "MAIN TARGET",
+    "profile.form.target_weight": "TARGET WEIGHT",
+    "profile.form.activity": "ACTIVITY LEVEL",
+    "profile.form.calories": "CALORIE TARGET",
+    "profile.form.cancel": "CANCEL",
+    "profile.form.save": "SAVE DATA",
   },
   id: {
-    // --- GENERAL / LANDING PAGE ---
+    
     "hero.tagline": "EKOSISTEM KESEHATAN CERDAS",
     "hero.title": "PERSONAL HEALTH AI",
     "hero.subtitle": "PENDAMPING KESEHATAN PINTAR ANDA.",
@@ -170,7 +277,7 @@ const translations: Record<Language, Record<string, string>> = {
       "Asisten kesehatan AI pribadi Anda sudah siap. Mulai evolusi Anda hari ini.",
     "btn.free": "COBA GRATIS",
 
-    // --- AUTH & ONBOARDING ---
+    
     "welcome.slide1.title": "Analisis Neural AI",
     "welcome.slide1.desc":
       "Mesin kami memindai penanda biologis Anda untuk menghitung dasar metabolik yang sempurna.",
@@ -208,7 +315,7 @@ const translations: Record<Language, Record<string, string>> = {
     "auth.error.generic": "Otentikasi Gagal. Coba lagi.",
     "auth.success": "Akses Diberikan. Mengalihkan...",
 
-    // --- PROFILE SETUP ---
+    
     "profile.setup.title.step1": "Metrik Tubuh",
     "profile.setup.desc.step1": "Mari mulai dengan menghitung BMI Anda.",
     "profile.setup.label.height": "Tinggi (cm)",
@@ -237,7 +344,7 @@ const translations: Record<Language, Record<string, string>> = {
     "profile.setup.btn.back": "Kembali",
     "profile.setup.btn.finish": "Hitung & Selesai",
 
-    // --- DASHBOARD (FIXED KEYS) ---
+    
     "dash.welcome": "Selamat Datang,",
     "dash.hello": "Halo,",
     "dash.today_overview": "Ringkasan Hari Ini",
@@ -261,6 +368,112 @@ const translations: Record<Language, Record<string, string>> = {
     "dash.act_ai_scan": "Scan AI",
     "dash.desc_ai_scan": "Analisa makanan",
     "dash.weekly_activity": "Aktivitas Mingguan",
+
+    
+    "meal.plan_title": "Rencana Makan",
+    "meal.plan_subtitle": "Rencanakan nutrisimu, otomatis atau manual.",
+    "meal.summary_title": "Ringkasan Nutrisi (Rencana)",
+    "meal.target": "Target",
+    "meal.select_goal": "Pilih Tujuan Diet:",
+    "meal.auto": "Otomatis",
+    "meal.manual": "Manual",
+    "meal.ai_generate": "AI Auto-Generate",
+    "meal.ai_desc": "Biarkan AI menyusun menu harian lengkap untukmu.",
+    "meal.manual_title": "Susun Manual",
+    "meal.manual_desc": "Pilih sendiri menu makananmu lewat pencarian AI.",
+    "meal.generating": "Meracik Menu...",
+    "meal.items": "Item",
+    "meal.add": "Tambah",
+    "meal.remove": "Hapus",
+    "meal.empty": "Kosong",
+    "meal.add_manual": "Tambah Manual",
+    "meal.breakfast": "Sarapan",
+    "meal.lunch": "Makan Siang",
+    "meal.dinner": "Makan Malam",
+    "meal.snacks": "Camilan",
+    "meal.calories": "Kalori",
+    "meal.protein": "Protein",
+    "meal.carbs": "Karbo",
+    "meal.fat": "Lemak",
+    "goal.low-cal": "Rendah Kalori",
+    "goal.standard": "Standard",
+    "goal.bulking": "Bulking",
+
+    
+    "search.title": "PENCARIAN MAKANAN NEURAL",
+    "search.subtitle": "Analisis Nutrisi Bertenaga AI",
+    "search.placeholder": "Masukkan nama makanan...",
+    "search.button": "CARI",
+    "search.results": "HASIL PENCARIAN",
+    "search.items_found": "ITEM DITEMUKAN",
+    "search.scanning": "MEMINDAI WEB AI...",
+    "search.processing": "Memproses data nutrisi global via AI...",
+    "search.ready": "Siap Mencari",
+    "search.ready_desc": "Masukkan nama makanan untuk melihat nilai gizi.",
+    "search.add_to_menu": "TAMBAH KE MENU",
+
+    
+    "exercise.title": "PROTOKOL LATIHAN",
+    "exercise.subtitle": "Peta Fitness Generasi AI",
+    "exercise.generate": "BUAT RENCANA BARU",
+    "exercise.tab.home": "LATIHAN RUMAH",
+    "exercise.tab.gym": "LATIHAN GYM",
+    "exercise.tab.cardio": "KARDIO",
+    "exercise.sets": "SET",
+    "exercise.reps": "REPS",
+    "exercise.rest": "ISTIRAHAT",
+    "exercise.min": "MNT",
+
+    
+    "progress.title": "PELACAK PROGRESS",
+    "progress.subtitle": "Pantau transformasi tubuh Anda.",
+    "progress.log_btn": "CATAT DATA BARU",
+    "progress.current_weight": "BERAT SAAT INI",
+    "progress.total_loss": "TOTAL TURUN",
+    "progress.achievement": "PENCAPAIAN",
+    "progress.total_entries": "TOTAL ENTRI",
+    "progress.chart.weight": "GRAFIK BERAT",
+    "progress.chart.measurements": "UKURAN TUBUH",
+    "progress.upload.before": "UPLOAD AWAL",
+    "progress.upload.after": "UPLOAD AKHIR",
+    "progress.share": "BAGIKAN PROGRESS",
+    "progress.modal.title": "INPUT BIOMETRIK",
+    "progress.modal.date": "TANGGAL PENCATATAN",
+    "progress.modal.weight": "BERAT BADAN (KG)",
+    "progress.modal.notes": "CATATAN TAMBAHAN",
+    "progress.modal.cancel": "BATAL",
+    "progress.modal.save": "SIMPAN DATA",
+
+    
+    "profile.title": "PROFIL OPERATOR",
+    "profile.subtitle": "Kelola identitas & preferensi sistem.",
+    "profile.edit": "EDIT PROFIL",
+    "profile.disconnect": "PUTUSKAN KONEKSI",
+    "profile.joined": "BERGABUNG",
+    "profile.status": "STATUS SISTEM",
+    "profile.online": "ONLINE",
+    "profile.target_ops": "TARGET & OPERASI",
+    "profile.nutrition_proto": "PROTOKOL NUTRISI",
+    "profile.restrictions": "PANTANGAN",
+    "profile.allergies": "ALERGI",
+    "profile.no_restrictions": "Tidak ada pantangan terdeteksi.",
+    "profile.no_allergies": "Tidak ada alergi terdeteksi.",
+    "profile.tap_update": "KETUK UNTUK GANTI ID VISUAL",
+    "profile.modal.identity": "EDIT IDENTITAS",
+    "profile.modal.objectives": "EDIT TUJUAN",
+    "profile.modal.protocols": "EDIT PROTOKOL",
+    "profile.label.height": "TINGGI",
+    "profile.label.weight": "BERAT",
+    "profile.label.age": "UMUR",
+    "profile.label.bmi": "BMI",
+    "profile.form.fullname": "NAMA LENGKAP",
+    "profile.form.email": "EMAIL",
+    "profile.form.target_main": "TARGET UTAMA",
+    "profile.form.target_weight": "TARGET BERAT",
+    "profile.form.activity": "LEVEL AKTIVITAS",
+    "profile.form.calories": "TARGET KALORI",
+    "profile.form.cancel": "BATAL",
+    "profile.form.save": "SIMPAN DATA",
   },
 };
 
@@ -296,7 +509,7 @@ export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   const t = (key: string) => {
-    // Fallback: Jika key tidak ditemukan di kamus, tampilkan key-nya
+    
     return translations[language][key] || key;
   };
 

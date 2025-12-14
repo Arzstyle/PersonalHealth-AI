@@ -2,13 +2,16 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import { NutritionProvider } from "./context/NutritionContext";
-import "./firebase"; // Initialize Firebase
+import { AuthProvider } from "./context/AuthContext";
+import "./firebase"; 
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <NutritionProvider>
-      <App />
-    </NutritionProvider>
+    <AuthProvider>
+      <NutritionProvider>
+        <App />
+      </NutritionProvider>
+    </AuthProvider>
   </React.StrictMode>
 );

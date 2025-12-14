@@ -19,16 +19,16 @@ import ProfileSetup from "./components/ProfileSetup";
 import { MealProvider } from "./context/MealContext";
 import { UIProvider } from "./context/UIContext";
 
-// --- FUNGSI CEK USER LEBIH AMAN ---
+
 const isUserOnboarded = () => {
   const userData = localStorage.getItem("user");
   if (!userData) return false;
   try {
-    // Cek apakah JSON valid
+    
     JSON.parse(userData);
     return true;
   } catch (e) {
-    // Jika data korup, anggap belum login (hapus data rusak)
+    
     localStorage.removeItem("user");
     return false;
   }
@@ -50,7 +50,7 @@ function App() {
       <UIProvider>
         <MealProvider>
           <Routes>
-            {/* Public routes */}
+            {}
             <Route
               path="/"
               element={
@@ -76,7 +76,7 @@ function App() {
               }
             />
 
-            {/* Protected routes */}
+            {}
             <Route
               path="/profile-setup"
               element={
@@ -149,7 +149,7 @@ function App() {
               }
             />
 
-            {/* Redirect unknown routes */}
+            {}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </MealProvider>
