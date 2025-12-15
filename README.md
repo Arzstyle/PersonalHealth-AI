@@ -4,6 +4,9 @@ Selamat datang di **PersonalHealth AI**, sebuah revolusi dalam cara Anda merenca
 
 Ditujukan untuk pengguna yang ingin mencapai target tubuh ideal mereka—baik itu menurunkan berat badan, membentuk otot (bulking), atau sekadar hidup lebih sehat—PersonalHealth AI hadir sebagai **Personal Trainer** dan **Nutritionist** digital yang selalu siap sedia 24/7.
 
+[![Status](https://img.shields.io/badge/status-active-success.svg)]()
+[![Version](https://img.shields.io/badge/version-2.0.0-brightgreen.svg)]()
+
 ---
 
 ## 👥 Tim Pengembang (The Developers)
