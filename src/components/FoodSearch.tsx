@@ -33,15 +33,11 @@ const FoodImage: React.FC<FoodImageProps> = ({ term, initialImage }) => {
   const [imgSrc, setImgSrc] = useState<string>("");
   const [retryStage, setRetryStage] = useState(0);
 
-  
-
   React.useEffect(() => {
     setRetryStage(0);
     if (initialImage && initialImage.startsWith("http")) {
       setImgSrc(initialImage);
     } else {
-      
-      
       setImgSrc(
         `https://tse2.mm.bing.net/th?q=${encodeURIComponent(
           term + " food"
@@ -52,7 +48,6 @@ const FoodImage: React.FC<FoodImageProps> = ({ term, initialImage }) => {
 
   const handleError = () => {
     if (retryStage === 0) {
-      
       setRetryStage(1);
       setImgSrc(
         `https://tse1.mm.bing.net/th?q=${encodeURIComponent(
@@ -60,7 +55,6 @@ const FoodImage: React.FC<FoodImageProps> = ({ term, initialImage }) => {
         )}&w=500&h=500&c=7&rs=1&p=0`
       );
     } else if (retryStage === 1) {
-      
       setRetryStage(2);
       setImgSrc(
         `https://image.pollinations.ai/prompt/${encodeURIComponent(
@@ -68,7 +62,6 @@ const FoodImage: React.FC<FoodImageProps> = ({ term, initialImage }) => {
         )}?width=500&height=500&nologo=true`
       );
     } else if (retryStage === 2) {
-      
       setRetryStage(3);
       setImgSrc("https://placehold.co/200x200?text=No+Image");
     }
@@ -170,11 +163,9 @@ const AISearch: React.FC<FoodSearchProps> = ({ onSelectFood }) => {
 
   return (
     <div className="w-full max-w-4xl mx-auto p-1 relative">
-      {}
       <div className="absolute inset-0 bg-slate-50 dark:bg-transparent bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none rounded-3xl"></div>
 
       <div className="relative z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-[2rem] p-6 sm:p-8 shadow-xl overflow-hidden transition-all duration-500">
-        {}
         <div className="flex items-center gap-4 mb-8">
           <div className="p-3 bg-cyan-100 dark:bg-cyan-900/20 rounded-xl text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.15)] animate-pulse">
             <Scan className="w-6 h-6" />
@@ -189,7 +180,6 @@ const AISearch: React.FC<FoodSearchProps> = ({ onSelectFood }) => {
           </div>
         </div>
 
-        {}
         <div className="relative group mb-8">
           <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
           <div className="relative flex items-center bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden shadow-inner h-14">
@@ -223,7 +213,6 @@ const AISearch: React.FC<FoodSearchProps> = ({ onSelectFood }) => {
           </div>
         </div>
 
-        {}
         {error && (
           <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-500/30 rounded-xl flex items-center gap-3 text-red-600 dark:text-red-400 animate-in fade-in slide-in-from-top-2">
             <AlertCircle className="w-5 h-5 flex-shrink-0" />
@@ -231,7 +220,6 @@ const AISearch: React.FC<FoodSearchProps> = ({ onSelectFood }) => {
           </div>
         )}
 
-        {}
         {isLoading && (
           <div className="flex flex-col items-center justify-center py-12 space-y-4">
             <div className="relative w-16 h-16">
@@ -251,7 +239,6 @@ const AISearch: React.FC<FoodSearchProps> = ({ onSelectFood }) => {
           </div>
         )}
 
-        {}
         {!isLoading && !error && searchResults.length === 0 && (
           <div className="text-center py-12 border-2 border-dashed border-slate-200 dark:border-white/5 rounded-2xl bg-slate-50/50 dark:bg-white/5">
             <div className="w-16 h-16 bg-slate-100 dark:bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
@@ -267,7 +254,6 @@ const AISearch: React.FC<FoodSearchProps> = ({ onSelectFood }) => {
           </div>
         )}
 
-        {}
         {!isLoading && searchResults.length > 0 && (
           <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex items-center justify-between mb-2">
@@ -285,10 +271,8 @@ const AISearch: React.FC<FoodSearchProps> = ({ onSelectFood }) => {
                 key={index}
                 className="group relative bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-white/10 rounded-2xl p-4 flex flex-col sm:flex-row gap-6 hover:border-cyan-400 dark:hover:border-cyan-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/5 overflow-hidden"
               >
-                {}
                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
 
-                {}
                 <div className="w-full sm:w-32 h-32 flex-shrink-0 bg-slate-100 dark:bg-slate-900 rounded-xl overflow-hidden relative border border-slate-100 dark:border-white/5 group-hover:scale-105 transition-transform duration-500">
                   <FoodImage term={food.name} initialImage={food.image} />
                   <div className="absolute bottom-0 left-0 right-0 p-1 bg-black/60 backdrop-blur-sm text-center">
@@ -307,7 +291,6 @@ const AISearch: React.FC<FoodSearchProps> = ({ onSelectFood }) => {
                     </div>
                   </div>
 
-                  {}
                   <div className="grid grid-cols-3 gap-2 mb-4">
                     <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-500/20 p-2 rounded-lg text-center">
                       <div className="text-[10px] text-blue-500 font-bold uppercase tracking-wider">
@@ -360,7 +343,6 @@ const AISearch: React.FC<FoodSearchProps> = ({ onSelectFood }) => {
           </div>
         )}
 
-        {}
         {addedFood && (
           <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-4 zoom-in-95 duration-300">
             <div className="bg-slate-900/90 dark:bg-cyan-950/90 backdrop-blur-md text-white px-6 py-3 rounded-2xl shadow-2xl border border-cyan-500/30 flex items-center gap-3">
