@@ -26,14 +26,12 @@ import { useUI } from "../context/UIContext";
 
 const AdaptiveBackground = () => (
   <>
-    {/* Blue Blob */}
     <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-100 dark:opacity-0 transition-opacity duration-700">
       <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-blue-200/40 rounded-full blur-[120px] mix-blend-multiply"></div>
       <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-purple-200/40 rounded-full blur-[120px] mix-blend-multiply"></div>
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px]"></div>
     </div>
 
-    {/* Dark Mode Cosmic Blobs */}
     <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-0 dark:opacity-100 transition-opacity duration-700 bg-[#050b14]">
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px]"></div>
       <div className="absolute inset-0 bg-gradient-to-t from-[#050b14] via-transparent to-[#050b14]"></div>
@@ -85,7 +83,6 @@ const Onboarding: React.FC = () => {
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState<any>(null);
 
-  // Helper: Sync Data from Cloud (Isolated used for Background Sync)
   const syncUserData = async (user: any, shouldNavigate = true) => {
     let finalUserData = {
       name:
@@ -107,7 +104,6 @@ const Onboarding: React.FC = () => {
     let isCloudSynced = false;
     const isOnline = navigator.onLine;
 
-    // Cloud Fetch Logic
     if (isOnline && !user.uid.startsWith("guest_local_")) {
       try {
         const userDocRef = doc(db, "users", user.uid);
@@ -116,7 +112,6 @@ const Onboarding: React.FC = () => {
           finalUserData = userSnapshot.data() as any;
           isCloudSynced = true;
         } else {
-          // New User in Cloud
           await setDoc(userDocRef, finalUserData);
           isCloudSynced = true;
         }
@@ -125,7 +120,6 @@ const Onboarding: React.FC = () => {
       }
     }
 
-    // Local Fallback (if Cloud sync failed completely)
     if (!isCloudSynced) {
       const local = localStorage.getItem("user");
       if (local) {
@@ -136,10 +130,8 @@ const Onboarding: React.FC = () => {
       }
     }
 
-    // Update Local Cache (Crucial)
     localStorage.setItem("user", JSON.stringify(finalUserData));
 
-    // Navigate IF requested (Standard Slow Path)
     if (shouldNavigate) {
       if (finalUserData.isSetupComplete) {
         navigate("/dashboard");
@@ -149,64 +141,51 @@ const Onboarding: React.FC = () => {
     }
   };
 
-  // Main Initializer
   const initializeAndRedirect = async (user: any) => {
     setIsLoading(true);
     setSuccess("Access Granted...");
 
-    // 1. FAST PATH: Check Local Cache First (Optimistic UI)
     const local = localStorage.getItem("user");
     let fastPathUser = null;
     if (local) {
       try {
         const parsed = JSON.parse(local);
-        // Security check: Match UID or Guest
         if (parsed.uid === user.uid || user.uid.startsWith("guest_local_")) {
           fastPathUser = parsed;
         }
       } catch (e) {}
     }
 
-    // If local data exists, GO IMMEDIATELY!
     if (fastPathUser && fastPathUser.isSetupComplete) {
       console.log("⚡ Fast Path: Login from Cache");
-      localStorage.setItem("user", JSON.stringify(fastPathUser)); // Refresh logic here if needed
+      localStorage.setItem("user", JSON.stringify(fastPathUser));
       navigate("/dashboard");
 
-      // BACKGROUND SYNC: Update data quietly for next session
       syncUserData(user, false).catch((err) =>
         console.error("BG Sync error", err)
       );
-      return; // STOP EXECUTION to prevent double navigation
+      return;
     }
-
-    // 2. SLOW PATH: No local data? (Clean Login)
-    // STRATEGY: "Jump to Dashboard" (Optimistic)
-    // Don't wait for Cloud Sync. Trust that the user is likely a returning user.
-    // If they are actually NEW, the Dashboard/Sync will detect it and redirect them to setup later.
 
     console.log("🚀 Optimistic Login: Jumping to Dashboard...");
 
-    // Create a temporary "Shell User" to bypass ProtectedRoute
     const shellUser = {
       name:
         user.displayName || (user.email ? user.email.split("@")[0] : "Guest"),
       email: user.email || "",
       uid: user.uid,
-      // Defaults to prevent Dashboard crash
       bmi: 0,
       weight: 0,
       height: 0,
       dailyCalories: 2000,
       goal: "maintain",
-      isSetupComplete: true, // Lie temporarily to get into Dashboard
-      isOptimistic: true, // Flag to tell Dashboard we are still loading real data
+      isSetupComplete: true,
+      isOptimistic: true,
     };
 
     localStorage.setItem("user", JSON.stringify(shellUser));
     navigate("/dashboard");
 
-    // Trigger Heavy Sync in Background
     syncUserData(user, false).catch((err) =>
       console.error("BG Sync Error:", err)
     );
@@ -216,12 +195,10 @@ const Onboarding: React.FC = () => {
     setError(null);
     setIsLoading(true);
     try {
-      // Try standard Firebase Guest Login (Online)
       const result = await signInAnonymously(auth);
       initializeAndRedirect(result.user);
     } catch (error) {
       console.warn("Guest Auth Offline Fallback", error);
-      // Offline fallback: Create local-only guest
       const offlineId = `guest_local_${Date.now()}`;
       const offlineUser = {
         uid: offlineId,
@@ -317,7 +294,6 @@ const Onboarding: React.FC = () => {
     }
   };
 
-  // Styles
   const inputClasses =
     "w-full p-3 rounded-xl text-sm transition-all outline-none border font-sans font-bold " +
     "bg-white dark:bg-black/40 " +
@@ -337,9 +313,7 @@ const Onboarding: React.FC = () => {
       <div id="recaptcha-container"></div>
 
       <div className="relative z-10 w-full max-w-md p-4 animate-fade-in">
-        {/* Glass Card */}
         <div className="bg-white/80 dark:bg-[#0a0f1e]/85 backdrop-blur-xl border border-white/60 dark:border-white/10 rounded-[2rem] overflow-hidden relative shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_rgba(0,0,0,0.6)] transition-all duration-300">
-          {/* Header */}
           <div className="p-6 pb-4 text-center">
             <div className="w-12 h-12 bg-blue-100 dark:bg-primary-900/50 rounded-2xl mx-auto flex items-center justify-center mb-4 border border-blue-200 dark:border-primary-500/30 shadow-sm dark:shadow-[0_0_20px_rgba(34,197,94,0.2)]">
               <Lock className="w-6 h-6 text-blue-600 dark:text-primary-500" />
@@ -352,7 +326,6 @@ const Onboarding: React.FC = () => {
             </p>
           </div>
 
-          {/* Tabs */}
           <div className="flex border-b border-gray-100 dark:border-gray-800 mx-6">
             <button
               onClick={() => setLoginMethod("email")}

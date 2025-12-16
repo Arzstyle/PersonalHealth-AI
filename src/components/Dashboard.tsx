@@ -88,7 +88,6 @@ const DashboardHeader = ({ user }: { user: any }) => {
     <div className="flex flex-col xl:flex-row justify-between items-end mb-8 pt-6 animate-enter transform-gpu relative z-20 gap-4">
       <div className="w-full xl:w-auto">
         <div className="flex items-center gap-2 mb-2 group cursor-default">
-          {}
           <div className="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-900 border border-cyan-200 dark:border-cyan-500/30 flex items-center gap-2 shadow-sm shadow-cyan-100 dark:shadow-[0_0_10px_rgba(6,182,212,0.2)] transition-transform group-hover:scale-105">
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-500 opacity-75"></span>
@@ -150,7 +149,6 @@ const CalorieRing = ({
   return (
     <div className="relative w-64 h-64 flex items-center justify-center group flex-shrink-0">
       {isGoalReached && <CyberConfetti />}
-      {}
       <div
         className={`absolute inset-0 rounded-full blur-[60px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 animate-pulse ${
           isGoalReached
@@ -159,7 +157,6 @@ const CalorieRing = ({
         }`}
       ></div>
 
-      {}
       <div className="absolute inset-0 border border-slate-300 dark:border-slate-700/30 rounded-full scale-110 border-dashed animate-[spin_20s_linear_infinite] will-change-transform"></div>
       <div className="absolute inset-0 border border-slate-300 dark:border-slate-700/30 rounded-full scale-125 border-dotted animate-[spin_15s_linear_infinite_reverse] will-change-transform"></div>
 
@@ -286,7 +283,6 @@ const Dashboard: React.FC = () => {
     return () => window.removeEventListener("storage", loadDietStats);
   }, []);
 
-  // OPTIMISTIC UI POLLER: Check for background sync updates
   useEffect(() => {
     if (!user?.isOptimistic) return;
 
@@ -295,15 +291,12 @@ const Dashboard: React.FC = () => {
       if (stored) {
         const parsed = JSON.parse(stored);
 
-        // If the background process removed 'isOptimistic' flag (Sync Complete)
         if (!parsed.isOptimistic) {
           console.log("🔄 Dashboard: Real User Data Arrived!");
 
           if (!parsed.isSetupComplete) {
-            // Turns out it's a new user -> Redirect to Setup
             window.location.href = "/profile-setup";
           } else {
-            // Apply real data to UI
             setUser(parsed);
             if (parsed.dailyCalories && parsed.goal) {
               setMacroTargets(
@@ -317,7 +310,7 @@ const Dashboard: React.FC = () => {
           }
         }
       }
-    }, 500); // Check every 500ms
+    }, 500);
 
     return () => clearInterval(interval);
   }, [user?.isOptimistic]);
@@ -330,7 +323,6 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="relative w-full px-6 flex flex-col pb-10 overflow-visible">
-      {}
       <div className="absolute inset-0 -z-10 h-full w-full bg-slate-50 dark:bg-transparent bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
 
       <style>{`
@@ -345,9 +337,7 @@ const Dashboard: React.FC = () => {
       <DashboardHeader user={user} />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10 animate-enter delay-100">
-        {}
         <div className="lg:col-span-8 flex flex-col gap-8">
-          {}
           <div
             className={`glass-panel rounded-[2.5rem] p-10 relative group hover:shadow-2xl transition-all duration-500 overflow-hidden bg-white/80 dark:bg-slate-900/80 backdrop-blur-md ${
               isGoalReached
@@ -355,9 +345,7 @@ const Dashboard: React.FC = () => {
                 : "hover:shadow-cyan-500/20 border-cyan-200 dark:border-cyan-500/30"
             }`}
           >
-            {}
             <div className="absolute inset-0 opacity-5 dark:opacity-10 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,#000_100%),linear-gradient(to_right,#000_1px,transparent_1px),linear-gradient(to_bottom,#000_1px,transparent_1px)] dark:bg-[radial-gradient(circle_at_center,transparent_0%,#000_100%),linear-gradient(to_right,#06b6d430_1px,transparent_1px),linear-gradient(to_bottom,#06b6d430_1px,transparent_1px)] bg-[size:24px_24px]"></div>
-            {}
             <div className="absolute inset-x-0 h-1 bg-cyan-400/20 blur-sm animate-scan z-0 pointer-events-none"></div>
 
             <div className="flex flex-col xl:flex-row items-center gap-12 relative z-10">
@@ -481,9 +469,7 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          {}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-enter delay-200">
-            {}
             <div className="glass-panel rounded-[2.5rem] p-8 relative group hover:-translate-y-1 hover:shadow-xl transition-all duration-300 bg-white/80 dark:bg-slate-900/80 border border-violet-200 dark:border-white/5 hover:border-violet-400 dark:hover:border-violet-500/30 shadow-violet-100/50 dark:shadow-none">
               <div className="absolute -right-6 -top-6 w-32 h-32 bg-violet-500/5 dark:bg-violet-500/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
               <div className="flex justify-between items-start mb-6 relative z-10">
@@ -507,7 +493,6 @@ const Dashboard: React.FC = () => {
                 </div>
               </div>
             </div>
-            {}
             <div className="glass-panel rounded-[2.5rem] p-8 relative group hover:-translate-y-1 hover:shadow-xl transition-all duration-300 bg-white/80 dark:bg-slate-900/80 border border-cyan-200 dark:border-white/5 hover:border-cyan-400 dark:hover:border-cyan-500/30 shadow-cyan-100/50 dark:shadow-none">
               <div className="absolute -right-6 -top-6 w-32 h-32 bg-cyan-500/5 dark:bg-cyan-500/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
               <div className="flex justify-between items-start mb-6 relative z-10">
@@ -543,7 +528,6 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {}
         <div className="lg:col-span-4 flex flex-col gap-8 animate-enter delay-300">
           <div className="glass-panel rounded-[2.5rem] p-8 flex flex-col h-full relative group hover:shadow-xl transition-all duration-300 bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-white/5 hover:border-cyan-400 dark:hover:border-cyan-500/30 shadow-slate-200/50 dark:shadow-none">
             <div className="flex items-center justify-between mb-8 px-1 relative z-10">

@@ -119,16 +119,13 @@ const ProfileSetup: React.FC = () => {
     setIsSaving(true);
 
     try {
-      // 1. Instantly update Local Storage (Source of Truth for Dashboard now)
       localStorage.setItem("user", JSON.stringify(updatedUser));
 
-      // 2. Fire & Forget Cloud Sync (Don't await, let it handle in BG)
       const userRef = doc(db, "users", user.uid);
       setDoc(userRef, updatedUser, { merge: true }).catch((err) =>
         console.warn("Background Sync Warning:", err)
       );
 
-      // 3. Instant Redirect
       navigate("/dashboard");
     } catch (e) {
       console.error("Critical Local Save Error:", e);
@@ -192,13 +189,11 @@ const ProfileSetup: React.FC = () => {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-[#f8fafc] dark:bg-[#050b14] relative overflow-hidden font-sans text-gray-900 dark:text-gray-100 transition-colors duration-500">
-      {/* Background Blobs */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px]"></div>
       <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-purple-200/40 dark:bg-primary-500/20 rounded-full blur-[100px] mix-blend-multiply dark:mix-blend-screen transition-all duration-700"></div>
       <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-200/40 dark:bg-blue-500/20 rounded-full blur-[100px] mix-blend-multiply dark:mix-blend-screen transition-all duration-700"></div>
 
       <div className="relative z-10 w-full max-w-2xl p-4 md:p-6">
-        {/* Progress Bar */}
         <div className="flex items-center gap-2 mb-8 justify-center">
           <div
             className={`h-1.5 rounded-full transition-all duration-500 ${
@@ -216,9 +211,7 @@ const ProfileSetup: React.FC = () => {
           ></div>
         </div>
 
-        {/* Card */}
         <div className="bg-white/70 dark:bg-[#0a0f1e]/80 backdrop-blur-2xl border border-white/60 dark:border-white/10 rounded-[2rem] p-6 md:p-10 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:shadow-2xl transition-all duration-300">
-          {/* Step 1: Body Metrics */}
           {step === 1 && (
             <form
               onSubmit={handleNextStep1}
@@ -236,7 +229,6 @@ const ProfileSetup: React.FC = () => {
                 </p>
               </div>
 
-              {/* Inputs Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest pl-1">
@@ -337,7 +329,6 @@ const ProfileSetup: React.FC = () => {
                 </div>
               </div>
 
-              {/* BMR & BMI Preview */}
               {height && weight && age && (
                 <div className="grid grid-cols-2 gap-4 animate-in slide-in-from-bottom-4 duration-500">
                   <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-100 dark:border-blue-500/30 rounded-2xl p-4 text-center shadow-sm">
@@ -387,7 +378,6 @@ const ProfileSetup: React.FC = () => {
             </form>
           )}
 
-          {/* Step 2: Goal & Activity */}
           {step === 2 && (
             <form
               onSubmit={handleFinish}
@@ -405,7 +395,6 @@ const ProfileSetup: React.FC = () => {
                 </p>
               </div>
 
-              {/* Activity Level */}
               <div className="space-y-3">
                 <label className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest pl-1">
                   {t("profile.setup.label.activity")}
@@ -435,7 +424,6 @@ const ProfileSetup: React.FC = () => {
                 </div>
               </div>
 
-              {/* Goal */}
               <div className="space-y-3">
                 <label className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest pl-1">
                   {t("profile.setup.label.goal")}
@@ -465,7 +453,6 @@ const ProfileSetup: React.FC = () => {
                 </div>
               </div>
 
-              {/* Daily Calorie Summary */}
               <div className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-primary-500/10 dark:to-orange-600/10 border border-orange-100 dark:border-primary-500/30 rounded-2xl p-5 flex items-center justify-between animate-in zoom-in duration-300 shadow-sm">
                 <div className="flex items-center gap-4">
                   <div className="p-2.5 bg-white dark:bg-primary-500/20 rounded-xl text-orange-600 dark:text-primary-400 shadow-sm">
@@ -481,7 +468,6 @@ const ProfileSetup: React.FC = () => {
                   </div>
                 </div>
                 <div className="text-right">
-                  {/* Calorie Calc */}
                   <span className="text-3xl font-sans font-black text-gray-900 dark:text-white tracking-tight">
                     {getDailyCaloriesDisplay()}
                   </span>
