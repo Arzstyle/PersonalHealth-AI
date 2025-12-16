@@ -119,23 +119,20 @@ const ProfileSetup: React.FC = () => {
     setIsSaving(true);
 
     try {
+      // 1. Instantly update Local Storage (Source of Truth for Dashboard now)
       localStorage.setItem("user", JSON.stringify(updatedUser));
 
+      // 2. Fire & Forget Cloud Sync (Don't await, let it handle in BG)
       const userRef = doc(db, "users", user.uid);
+      setDoc(userRef, updatedUser, { merge: true }).catch((err) =>
+        console.warn("Background Sync Warning:", err)
+      );
 
-      // PERBAIKAN: Hapus timeout race condition.
-      // Kita HARUS menunggu save selesai untuk memastikan data persisten.
-      await setDoc(userRef, updatedUser, { merge: true });
-
-      // Jika sukses, baru navigasi
+      // 3. Instant Redirect
       navigate("/dashboard");
     } catch (e) {
-      console.error("Cloud save failed:", e);
-      setIsSaving(false); // Stop loading indicator
-      alert(
-        "Gagal menyimpan profil ke Cloud. Periksa koneksi internet Anda dan coba lagi."
-      );
-      // JANGAN navigate jika gagal, biarkan user mencoba lagi.
+      console.error("Critical Local Save Error:", e);
+      setIsSaving(false);
     }
   };
 

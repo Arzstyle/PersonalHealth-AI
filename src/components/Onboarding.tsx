@@ -19,7 +19,6 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   signInAnonymously,
-  signOut,
 } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
@@ -129,6 +128,27 @@ const Onboarding: React.FC = () => {
       allergies: [],
       createdAt: new Date().toISOString(),
     };
+
+    // 1. INSTANT LOAD: Check Local Cache First (Stale-While-Revalidate)
+    const local = localStorage.getItem("user");
+    let fastPathUser = null;
+    if (local) {
+      try {
+        const parsed = JSON.parse(local);
+        // Match UID to ensure security (basic)
+        if (parsed.uid === user.uid || user.uid.startsWith("guest_local_")) {
+          fastPathUser = parsed;
+        }
+      } catch (e) {}
+    }
+
+    // If we have local data, GO NOW!
+    if (fastPathUser && fastPathUser.isSetupComplete) {
+      console.log("⚡ Fast Path: Login from Cache");
+      localStorage.setItem("user", JSON.stringify(fastPathUser)); // Refresh timestamp if needed
+      navigate("/dashboard");
+      // We still continue below to Sync Cloud Data in Background...
+    }
 
     // 2. Decide Source: Cloud vs Local
     let isCloudSynced = false;
