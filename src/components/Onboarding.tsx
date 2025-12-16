@@ -180,8 +180,36 @@ const Onboarding: React.FC = () => {
       return; // STOP EXECUTION to prevent double navigation
     }
 
-    // 2. SLOW PATH: No local data? Do full sync and then navigate.
-    await syncUserData(user, true);
+    // 2. SLOW PATH: No local data? (Clean Login)
+    // STRATEGY: "Jump to Dashboard" (Optimistic)
+    // Don't wait for Cloud Sync. Trust that the user is likely a returning user.
+    // If they are actually NEW, the Dashboard/Sync will detect it and redirect them to setup later.
+
+    console.log("🚀 Optimistic Login: Jumping to Dashboard...");
+
+    // Create a temporary "Shell User" to bypass ProtectedRoute
+    const shellUser = {
+      name:
+        user.displayName || (user.email ? user.email.split("@")[0] : "Guest"),
+      email: user.email || "",
+      uid: user.uid,
+      // Defaults to prevent Dashboard crash
+      bmi: 0,
+      weight: 0,
+      height: 0,
+      dailyCalories: 2000,
+      goal: "maintain",
+      isSetupComplete: true, // Lie temporarily to get into Dashboard
+      isOptimistic: true, // Flag to tell Dashboard we are still loading real data
+    };
+
+    localStorage.setItem("user", JSON.stringify(shellUser));
+    navigate("/dashboard");
+
+    // Trigger Heavy Sync in Background
+    syncUserData(user, false).catch((err) =>
+      console.error("BG Sync Error:", err)
+    );
   };
 
   const handleGuestAuth = async () => {

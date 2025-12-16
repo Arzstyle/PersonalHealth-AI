@@ -286,6 +286,42 @@ const Dashboard: React.FC = () => {
     return () => window.removeEventListener("storage", loadDietStats);
   }, []);
 
+  // OPTIMISTIC UI POLLER: Check for background sync updates
+  useEffect(() => {
+    if (!user?.isOptimistic) return;
+
+    const interval = setInterval(() => {
+      const stored = localStorage.getItem("user");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+
+        // If the background process removed 'isOptimistic' flag (Sync Complete)
+        if (!parsed.isOptimistic) {
+          console.log("🔄 Dashboard: Real User Data Arrived!");
+
+          if (!parsed.isSetupComplete) {
+            // Turns out it's a new user -> Redirect to Setup
+            window.location.href = "/profile-setup";
+          } else {
+            // Apply real data to UI
+            setUser(parsed);
+            if (parsed.dailyCalories && parsed.goal) {
+              setMacroTargets(
+                calculateMacroTargets(
+                  parsed.dailyCalories,
+                  parsed.goal,
+                  parsed.weight
+                )
+              );
+            }
+          }
+        }
+      }
+    }, 500); // Check every 500ms
+
+    return () => clearInterval(interval);
+  }, [user?.isOptimistic]);
+
   if (!user) return null;
 
   const activeTarget =
