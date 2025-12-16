@@ -11,7 +11,7 @@ import {
   Globe,
   Activity,
   Cpu,
-  Search, 
+  Search,
 } from "lucide-react";
 import { useUI } from "../context/UIContext";
 
@@ -33,7 +33,6 @@ const Navigation: React.FC<NavigationProps> = ({ showLinks = true }) => {
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50 h-20 transition-all duration-700 ease-in-out transform-gpu select-none">
-      {}
       <style>{`
         @keyframes orbit-3d-1 { 0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); } 100% { transform: rotateX(360deg) rotateY(180deg) rotateZ(360deg); } }
         @keyframes orbit-3d-2 { 0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); } 100% { transform: rotateX(-360deg) rotateY(360deg) rotateZ(-180deg); } }
@@ -59,21 +58,17 @@ const Navigation: React.FC<NavigationProps> = ({ showLinks = true }) => {
         .dark .nav-item-shine { background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent); }
       `}</style>
 
-      {}
       <div className="absolute inset-0 bg-slate-50/90 dark:bg-[#030712]/90 backdrop-blur-xl border-b border-slate-300 dark:border-white/5 shadow-lg shadow-slate-300/30 dark:shadow-cyan-900/5 transition-all duration-700"></div>
 
-      {}
       <div className="absolute bottom-0 left-0 right-0 h-[2px] overflow-hidden z-20">
         <div className="w-full h-full animate-scan-laser opacity-60 dark:opacity-100 transition-opacity duration-700"></div>
       </div>
 
       <div className="relative w-full h-full px-6 flex justify-between items-center mx-auto z-10">
-        {}
         <NavLink
           to="/dashboard"
           className="flex items-center gap-5 cursor-pointer group btn-press no-underline relative pl-2 flex-shrink-0"
         >
-          {}
           <div className="relative w-14 h-14 flex items-center justify-center perspective-1000">
             <div className="absolute inset-0 bg-cyan-400/20 dark:bg-cyan-400/10 rounded-full blur-xl animate-pulse-slow"></div>
             <div className="absolute inset-0 transform-style-3d">
@@ -89,7 +84,6 @@ const Navigation: React.FC<NavigationProps> = ({ showLinks = true }) => {
             </div>
           </div>
 
-          {}
           <div className="flex flex-col whitespace-nowrap">
             <span className="text-2xl font-black text-slate-800 dark:text-white tracking-tighter leading-none group-hover:tracking-wide transition-all duration-500 relative">
               HEALTH
@@ -105,7 +99,6 @@ const Navigation: React.FC<NavigationProps> = ({ showLinks = true }) => {
           </div>
         </NavLink>
 
-        {}
         {showLinks && (
           <nav className="hidden lg:flex items-center p-1.5 bg-slate-200/50 dark:bg-white/5 rounded-2xl border border-slate-300 dark:border-white/5 backdrop-blur-md shadow-inner transition-all duration-700">
             {navItems.map((item) => (
@@ -147,7 +140,6 @@ const Navigation: React.FC<NavigationProps> = ({ showLinks = true }) => {
           </nav>
         )}
 
-        {}
         <div className="flex items-center gap-3 pl-6 border-l border-slate-300 dark:border-white/10 flex-shrink-0">
           <button
             onClick={() => setLanguage(language === "en" ? "id" : "en")}

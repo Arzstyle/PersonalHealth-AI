@@ -26,7 +26,6 @@ import {
   CheckCircle,
 } from "lucide-react";
 
-
 import burpeeAnim from "../animations/Burpee.json";
 import squatAnim from "../animations/squat.json";
 import pushupAnim from "../animations/Military Push Ups.json";
@@ -37,7 +36,6 @@ import jackAnim from "../animations/JumpingJack.json";
 import situpAnim from "../animations/situp.json";
 import bridgeAnim from "../animations/glutebridge.json";
 import supermanAnim from "../animations/superman.json";
-
 
 const HOME_CATEGORIES = [
   {
@@ -315,7 +313,6 @@ const GYM_CATEGORIES = [
   },
 ];
 
-
 const WorkoutSessionOverlay = ({
   exercise,
   onClose,
@@ -331,7 +328,6 @@ const WorkoutSessionOverlay = ({
   const [currentSet, setCurrentSet] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
 
-  
   useEffect(() => {
     if (phase === "countdown") {
       if (countdown > 0) {
@@ -343,7 +339,6 @@ const WorkoutSessionOverlay = ({
     }
   }, [countdown, phase]);
 
-  
   useEffect(() => {
     let interval: any;
     if (phase === "active" && !isPaused) {
@@ -361,22 +356,18 @@ const WorkoutSessionOverlay = ({
   const handleFinishSet = () => {
     if (currentSet < exercise.sets) {
       setCurrentSet((c) => c + 1);
-      setTimer(0); 
-      
+      setTimer(0);
     } else {
-      
       onClose();
     }
   };
 
   return (
     <div className="fixed top-0 left-0 w-screen h-screen z-[9999] bg-slate-950 flex flex-col overflow-hidden">
-      {}
       <div className="absolute inset-0 opacity-20 pointer-events-none bg-[linear-gradient(to_right,#06b6d41a_1px,transparent_1px),linear-gradient(to_bottom,#06b6d41a_1px,transparent_1px)] bg-[size:40px_40px]"></div>
       <div className="absolute top-0 inset-x-0 h-1 bg-cyan-500 shadow-[0_0_20px_cyan]"></div>
       <div className="absolute bottom-0 inset-x-0 h-1 bg-cyan-500 shadow-[0_0_20px_cyan]"></div>
 
-      {}
       <div className="relative z-10 flex justify-between items-center p-6 border-b border-white/10 bg-slate-900/50 backdrop-blur-md">
         <div className="flex items-center gap-4">
           <div className="p-2 bg-cyan-500/20 rounded-lg border border-cyan-500/50">
@@ -399,9 +390,7 @@ const WorkoutSessionOverlay = ({
         </button>
       </div>
 
-      {}
       <div className="flex-1 relative flex items-center justify-center p-6">
-        {}
         {phase === "countdown" && (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm">
             <div className="text-[12rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-cyan-400 to-blue-600 animate-ping font-mono">
@@ -410,17 +399,13 @@ const WorkoutSessionOverlay = ({
           </div>
         )}
 
-        {}
         <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {}
           <div className="relative aspect-square lg:aspect-video bg-slate-900/50 rounded-3xl border border-cyan-500/30 overflow-hidden shadow-[0_0_30px_rgba(6,182,212,0.1)]">
-            {}
             <div className="absolute top-4 left-4 w-4 h-4 border-l-2 border-t-2 border-cyan-400"></div>
             <div className="absolute top-4 right-4 w-4 h-4 border-r-2 border-t-2 border-cyan-400"></div>
             <div className="absolute bottom-4 left-4 w-4 h-4 border-l-2 border-b-2 border-cyan-400"></div>
             <div className="absolute bottom-4 right-4 w-4 h-4 border-r-2 border-b-2 border-cyan-400"></div>
 
-            {}
             {exercise.anim && (
               <div className="w-full h-full p-8">
                 <Lottie
@@ -432,9 +417,7 @@ const WorkoutSessionOverlay = ({
             )}
           </div>
 
-          {}
           <div className="flex flex-col gap-6">
-            {}
             <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center relative overflow-hidden group">
               <div className="absolute inset-0 bg-cyan-500/5 group-hover:bg-cyan-500/10 transition-colors"></div>
               <span className="text-sm text-cyan-500 font-bold tracking-[0.2em] uppercase mb-2 block">
@@ -445,7 +428,6 @@ const WorkoutSessionOverlay = ({
               </div>
             </div>
 
-            {}
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl text-center">
                 <span className="text-xs text-slate-400 uppercase tracking-wider">
@@ -468,7 +450,6 @@ const WorkoutSessionOverlay = ({
               </div>
             </div>
 
-            {}
             <div className="grid grid-cols-2 gap-4 mt-4">
               <button
                 onClick={() => setIsPaused(!isPaused)}
@@ -507,12 +488,10 @@ const ExercisePlanning: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<any | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  
   const [activeSessionExercise, setActiveSessionExercise] = useState<
     any | null
   >(null);
 
-  
   const [generatedWorkout, setGeneratedWorkout] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
 
@@ -529,7 +508,6 @@ const ExercisePlanning: React.FC = () => {
 
     setIsGenerating(true);
     try {
-      
       const targetCals = userProfile.dailyCalories || 2000;
 
       const plan = await generateExercisePlanAI(
@@ -545,11 +523,6 @@ const ExercisePlanning: React.FC = () => {
       );
 
       if (plan) {
-        
-        
-        
-        
-
         const combinedExercises = [
           ...plan.warm_up.map((e, i) => ({
             ...e,
@@ -583,8 +556,8 @@ const ExercisePlanning: React.FC = () => {
         };
 
         setGeneratedWorkout([aiCategory]);
-        setActiveTab("home"); 
-        setSelectedCategory(aiCategory); 
+        setActiveTab("home");
+        setSelectedCategory(aiCategory);
       }
     } catch (error) {
       console.error("AI Gen Error", error);
@@ -594,11 +567,8 @@ const ExercisePlanning: React.FC = () => {
     }
   };
 
-  const handleManualPlan = () => {
-    
-  };
+  const handleManualPlan = () => {};
 
-  
   const getCategoryStyle = (cat: any) => {
     const colors: any = {
       orange: {
@@ -635,20 +605,16 @@ const ExercisePlanning: React.FC = () => {
     return colors[cat.color] || colors.blue;
   };
 
-  
   const renderDashboard = () => {
     let data = activeTab === "home" ? HOME_CATEGORIES : GYM_CATEGORIES;
 
-    
     if (generatedWorkout && activeTab === "home") {
       data = [...generatedWorkout, ...data];
     }
 
     return (
       <div className="animate-enter w-full space-y-8">
-        {}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 transform-gpu">
-          {}
           <button
             onClick={handleAiGenerate}
             disabled={isGenerating}
@@ -718,7 +684,6 @@ const ExercisePlanning: React.FC = () => {
             </div>
           </button>
 
-          {}
           <button
             onClick={handleManualPlan}
             className="relative overflow-hidden group glass-panel text-slate-800 p-1 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-white/5 bg-white dark:bg-transparent hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 text-left btn-press transform-gpu"
@@ -745,7 +710,6 @@ const ExercisePlanning: React.FC = () => {
           </button>
         </div>
 
-        {}
         <div>
           <div className="flex items-center gap-3 mb-6 px-2">
             <div className="p-2 bg-orange-100 dark:bg-orange-900/20 rounded-lg text-orange-600 dark:text-orange-400 shadow-sm">
@@ -813,13 +777,11 @@ const ExercisePlanning: React.FC = () => {
     );
   };
 
-  
   const renderDetailView = () => {
     if (!selectedCategory) return null;
 
     return (
       <div className="animate-enter w-full transform-gpu">
-        {}
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={() => setSelectedCategory(null)}
@@ -842,7 +804,6 @@ const ExercisePlanning: React.FC = () => {
           </div>
         </div>
 
-        {}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {selectedCategory.exercises.map((ex: any, idx: number) => (
             <div
@@ -851,7 +812,6 @@ const ExercisePlanning: React.FC = () => {
                 idx * 100
               }`}
             >
-              {}
               <div className="h-56 bg-slate-50 dark:bg-slate-800/30 flex items-center justify-center relative border-b border-slate-100 dark:border-white/5 overflow-hidden">
                 <div className="absolute inset-0 opacity-10 bg-[linear-gradient(rgba(0,0,0,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.1)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none"></div>
 
@@ -893,7 +853,6 @@ const ExercisePlanning: React.FC = () => {
                 </div>
               </div>
 
-              {}
               <div className="p-6 flex flex-col flex-1 relative bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
                 <div className="flex-1">
                   <div className="flex justify-between items-start mb-2">
@@ -942,9 +901,8 @@ const ExercisePlanning: React.FC = () => {
                   </div>
                 </div>
 
-                {}
                 <button
-                  onClick={() => setActiveSessionExercise(ex)} 
+                  onClick={() => setActiveSessionExercise(ex)}
                   className="group/btn relative w-full mt-6 py-3 rounded-xl bg-slate-900 dark:bg-cyan-600 text-white font-bold text-sm overflow-hidden shadow-lg shadow-slate-900/20 dark:shadow-cyan-500/20 transition-all hover:scale-[1.02] active:scale-95"
                 >
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></div>
@@ -963,7 +921,6 @@ const ExercisePlanning: React.FC = () => {
 
   return (
     <div className="w-full max-w-[1800px] mx-auto px-6 lg:px-10 pb-20 relative">
-      {}
       {activeSessionExercise && (
         <WorkoutSessionOverlay
           exercise={activeSessionExercise}
@@ -971,7 +928,6 @@ const ExercisePlanning: React.FC = () => {
         />
       )}
 
-      {}
       <div className="absolute inset-0 -z-10 h-full w-full bg-slate-50 dark:bg-transparent bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
 
       <style>{`
@@ -981,7 +937,6 @@ const ExercisePlanning: React.FC = () => {
           .animate-scan { animation: scan 2s linear infinite; }
       `}</style>
 
-      {}
       <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4 pt-6 animate-enter transform-gpu">
         <div>
           <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white flex items-center gap-4 drop-shadow-sm">
@@ -997,7 +952,6 @@ const ExercisePlanning: React.FC = () => {
           </p>
         </div>
 
-        {}
         <div className="flex bg-white dark:bg-slate-900 rounded-full p-1.5 shadow-sm border border-slate-200 dark:border-white/5">
           <button
             onClick={() => {
@@ -1030,7 +984,6 @@ const ExercisePlanning: React.FC = () => {
         </div>
       </div>
 
-      {}
       <div className="transition-all duration-300">
         {selectedCategory ? renderDetailView() : renderDashboard()}
       </div>

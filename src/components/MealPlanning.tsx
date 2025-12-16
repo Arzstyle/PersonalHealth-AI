@@ -95,19 +95,15 @@ const CyberConfetti = React.memo(() => {
 const CyberRobotCelebration = () => {
   return (
     <div className="fixed top-0 left-0 w-screen h-screen z-[9999] flex items-center justify-center overflow-hidden">
-      {}
       <div className="absolute inset-0 bg-slate-50/90 dark:bg-slate-950/90 animate-fade-in-fast backdrop-blur-sm">
         <div className="absolute inset-0 opacity-10 dark:opacity-20 bg-[linear-gradient(rgba(6,182,212,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.2)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
       </div>
 
-      {}
       <div className="relative z-10 w-full max-w-md animate-pop-up-cyber transform-gpu">
-        {}
         <div className="absolute -top-20 -left-20 w-60 h-60 bg-cyan-500/20 rounded-full blur-[60px]"></div>
         <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-purple-500/20 rounded-full blur-[60px]"></div>
 
         <div className="relative bg-white dark:bg-slate-900 border border-cyan-500/30 dark:border-cyan-500/50 rounded-3xl p-1 overflow-hidden shadow-2xl shadow-cyan-500/10">
-          {}
           <div className="absolute inset-0 w-full h-1 bg-cyan-400/50 blur-sm animate-scan z-20 pointer-events-none will-change-transform"></div>
 
           <div className="bg-slate-50 dark:bg-slate-950 rounded-[1.3rem] p-8 flex flex-col items-center text-center relative overflow-hidden">
@@ -477,7 +473,6 @@ const MealPlanning: React.FC = () => {
 
   return (
     <div className="w-full px-6 flex flex-col pb-10 relative">
-      {}
       <div className="absolute inset-0 -z-10 h-full w-full bg-slate-50 dark:bg-transparent bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
 
       <style>{`
@@ -533,11 +528,9 @@ const MealPlanning: React.FC = () => {
       )}
 
       <div className="animate-enter w-full transform-gpu">
-        {}
         <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4 pt-6">
           <div>
             <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white flex items-center gap-4 drop-shadow-sm">
-              {}
               <div className="relative p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-cyan-500/30 shadow-lg shadow-slate-200/50 dark:shadow-none transition-transform hover:scale-105 group overflow-hidden">
                 <div className="absolute inset-0 bg-cyan-100/50 dark:bg-cyan-500/10 animate-pulse"></div>
                 <BrainCircuit className="w-8 h-8 text-cyan-600 dark:text-cyan-400 relative z-10" />
@@ -551,7 +544,6 @@ const MealPlanning: React.FC = () => {
             </p>
           </div>
 
-          {}
           <div className="glass-panel px-3 py-2 flex items-center gap-2 select-none rounded-xl border border-slate-200 dark:border-white/5 shadow-sm btn-press transition-colors duration-300 hover:border-cyan-500/30 bg-white dark:bg-transparent">
             <button
               onClick={() => changeDate(-1)}
@@ -572,7 +564,6 @@ const MealPlanning: React.FC = () => {
           </div>
         </div>
 
-        {}
         <div className="glass-panel p-6 mb-10 relative overflow-hidden group rounded-[2.5rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-transparent shadow-xl shadow-slate-200/50 dark:shadow-none transition-colors duration-500 transform-gpu">
           <div className="flex justify-between items-center mb-6 relative z-10">
             <h3 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
@@ -654,7 +645,6 @@ const MealPlanning: React.FC = () => {
           </div>
         </div>
 
-        {}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10 transform-gpu">
           <div className="flex flex-col gap-4">
             <div className="glass-panel p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-white/5 bg-white dark:bg-transparent transition-colors duration-300">
@@ -678,7 +668,6 @@ const MealPlanning: React.FC = () => {
               </div>
             </div>
 
-            {}
             <button
               onClick={handleAiGenerate}
               disabled={isGenerating}
@@ -694,12 +683,10 @@ const MealPlanning: React.FC = () => {
                   }`}
               ></div>
 
-              {}
               <div
                 className={`relative h-full bg-white dark:bg-slate-950 rounded-[1.9rem] overflow-hidden flex flex-col justify-between p-6 m-[1px]
                 ${isGenerating ? "bg-slate-50 dark:bg-slate-900" : ""}`}
               >
-                {}
                 <div
                   className={`absolute inset-0 opacity-10 pointer-events-none
                     bg-[radial-gradient(circle_at_center,transparent_0%,#000_100%),linear-gradient(to_right,#000_1px,transparent_1px),linear-gradient(to_bottom,#000_1px,transparent_1px)] dark:bg-[radial-gradient(circle_at_center,transparent_0%,#000_100%),linear-gradient(to_right,#fff_1px,transparent_1px),linear-gradient(to_bottom,#fff_1px,transparent_1px)] bg-[size:24px_24px]
@@ -775,7 +762,6 @@ const MealPlanning: React.FC = () => {
             </button>
           </div>
 
-          {}
           <button
             onClick={handleManualPlan}
             className="relative overflow-hidden group glass-panel text-slate-800 p-1 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-white/5 bg-white dark:bg-transparent hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 text-left btn-press transform-gpu"
@@ -806,7 +792,6 @@ const MealPlanning: React.FC = () => {
           </button>
         </div>
 
-        {}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 transform-gpu">
           {["breakfast", "lunch", "dinner", "snacks"].map((mealType) => {
             const style = getCategoryStyle(mealType);
@@ -882,7 +867,6 @@ const MealPlanning: React.FC = () => {
                               )}
                             </button>
 
-                            {}
                             <div
                               className={`w-12 h-12 flex items-center justify-center rounded-2xl shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 ${
                                 food.completed

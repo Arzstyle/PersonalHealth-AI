@@ -11,7 +11,7 @@ interface MealContextType {
   setConsumedCalories: React.Dispatch<React.SetStateAction<number>>;
   totalPlanCalories: number;
   setTotalPlanCalories: React.Dispatch<React.SetStateAction<number>>;
-  
+
   totalCaloriesConsumed: number;
   todaysMacros: MacroData;
   setTodaysMacros: React.Dispatch<React.SetStateAction<MacroData>>;
@@ -37,7 +37,7 @@ export const MealProvider: React.FC<{ children: React.ReactNode }> = ({
         setConsumedCalories,
         totalPlanCalories,
         setTotalPlanCalories,
-        totalCaloriesConsumed: consumedCalories, 
+        totalCaloriesConsumed: consumedCalories,
         todaysMacros,
         setTodaysMacros,
       }}

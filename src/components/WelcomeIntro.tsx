@@ -65,17 +65,13 @@ const WelcomeIntro: React.FC = () => {
   };
 
   return (
-    
     <div className="min-h-screen w-full flex items-center justify-center bg-[#f8fafc] dark:bg-[#050b14] relative overflow-hidden font-sans transition-colors duration-500">
-      {}
-      {}
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-100 dark:opacity-0 transition-opacity duration-700">
         <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-purple-200/40 rounded-full blur-[120px] mix-blend-multiply"></div>
         <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-blue-200/40 rounded-full blur-[120px] mix-blend-multiply"></div>
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px]"></div>
       </div>
 
-      {}
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-0 dark:opacity-100 transition-opacity duration-700">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px]"></div>
         <div className="absolute top-[-20%] left-[-20%] w-[600px] h-[600px] bg-primary-500/10 rounded-full blur-[150px] mix-blend-screen animate-pulse"></div>
@@ -86,9 +82,7 @@ const WelcomeIntro: React.FC = () => {
       </div>
 
       <div className="relative z-10 w-full max-w-4xl p-4 sm:p-6 h-full sm:h-auto flex items-center justify-center">
-        {}
         <div className="bg-white/70 dark:bg-[#0a0f1e]/90 backdrop-blur-xl border border-white/60 dark:border-white/10 rounded-[2.5rem] p-6 sm:p-12 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] w-full relative overflow-hidden transition-all duration-300">
-          {}
           <div className="flex justify-between items-center mb-8 sm:mb-12">
             <div className="flex items-center gap-2">
               <Zap className="w-5 h-5 text-primary-600 dark:text-primary-500 fill-primary-600/20 dark:fill-primary-500/20" />
@@ -120,7 +114,6 @@ const WelcomeIntro: React.FC = () => {
                   key={slide.id}
                   className="w-full flex-shrink-0 flex flex-col sm:flex-row items-center gap-8 sm:gap-16 px-4"
                 >
-                  {}
                   <div className="relative group flex-1 flex justify-center">
                     <div
                       className={`absolute inset-0 ${slide.bg} rounded-full blur-[60px] group-hover:blur-[80px] transition-all opacity-70 dark:opacity-100`}
@@ -135,7 +128,6 @@ const WelcomeIntro: React.FC = () => {
                     </div>
                   </div>
 
-                  {}
                   <div className="flex-1 text-center sm:text-left space-y-6">
                     <div>
                       <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white font-display tracking-tight mb-4 leading-tight">
@@ -146,7 +138,6 @@ const WelcomeIntro: React.FC = () => {
                       </p>
                     </div>
 
-                    {}
                     <div className="grid gap-3 pt-4">
                       {slide.features.map((feature, idx) => (
                         <div
@@ -166,7 +157,6 @@ const WelcomeIntro: React.FC = () => {
             </div>
           </div>
 
-          {}
           <div className="flex justify-between items-center mt-8 sm:mt-12 pt-6 border-t border-gray-200 dark:border-white/10">
             <button
               onClick={prevSlide}

@@ -4,8 +4,8 @@ export interface User {
   email: string;
   age: number;
   gender: "male" | "female";
-  height: number; 
-  weight: number; 
+  height: number;
+  weight: number;
   activityLevel: "sedentary" | "light" | "moderate" | "active" | "very-active";
   goal: "weight-loss" | "weight-gain" | "muscle-gain";
   dietaryRestrictions: string[];
@@ -51,7 +51,7 @@ export interface Exercise {
   name: string;
   category: string;
   description: string;
-  duration: number; 
+  duration: number;
   caloriesBurned: number;
   difficulty: "beginner" | "intermediate" | "advanced";
   equipment: string[];
