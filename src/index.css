@@ -52,7 +52,6 @@
   animation-delay: 500ms;
 }
 
-/* Aurora: Restored for Text Shimmer (Background Position) */
 @keyframes aurora {
   0% {
     background-position: 0% 50%;
@@ -68,7 +67,6 @@
   animation: aurora 10s ease infinite;
 }
 
-/* Blob Spin: New efficient animation for background blobs */
 @keyframes blob-spin {
   0% {
     transform: rotate(0deg) scale(1);
@@ -123,7 +121,7 @@
          shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-black/60
          ring-1 ring-slate-900/5 dark:ring-white/5
          transition-all duration-500 ease-out;
-  transform: translateZ(0); /* Hardware Acceleration */
+  transform: translateZ(0);
   will-change: transform;
 }
 
