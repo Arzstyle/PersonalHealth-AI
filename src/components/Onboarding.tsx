@@ -85,6 +85,105 @@ const Onboarding: React.FC = () => {
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState<any>(null);
 
+  // Helper: Sync Data from Cloud (Isolated used for Background Sync)
+  const syncUserData = async (user: any, shouldNavigate = true) => {
+    let finalUserData = {
+      name:
+        user.displayName || (user.email ? user.email.split("@")[0] : "Guest"),
+      email: user.email || "",
+      uid: user.uid,
+      age: 0,
+      height: 0,
+      weight: 0,
+      gender: "male",
+      goal: "weight-loss",
+      activityLevel: "moderate",
+      isSetupComplete: false,
+      dietaryRestrictions: [],
+      allergies: [],
+      createdAt: new Date().toISOString(),
+    };
+
+    let isCloudSynced = false;
+    const isOnline = navigator.onLine;
+
+    // Cloud Fetch Logic
+    if (isOnline && !user.uid.startsWith("guest_local_")) {
+      try {
+        const userDocRef = doc(db, "users", user.uid);
+        const userSnapshot = await getDoc(userDocRef);
+        if (userSnapshot.exists()) {
+          finalUserData = userSnapshot.data() as any;
+          isCloudSynced = true;
+        } else {
+          // New User in Cloud
+          await setDoc(userDocRef, finalUserData);
+          isCloudSynced = true;
+        }
+      } catch (err) {
+        console.warn("Cloud Sync Detached Error:", err);
+      }
+    }
+
+    // Local Fallback (if Cloud sync failed completely)
+    if (!isCloudSynced) {
+      const local = localStorage.getItem("user");
+      if (local) {
+        try {
+          const parsed = JSON.parse(local);
+          if (parsed.uid === user.uid) finalUserData = parsed;
+        } catch (e) {}
+      }
+    }
+
+    // Update Local Cache (Crucial)
+    localStorage.setItem("user", JSON.stringify(finalUserData));
+
+    // Navigate IF requested (Standard Slow Path)
+    if (shouldNavigate) {
+      if (finalUserData.isSetupComplete) {
+        navigate("/dashboard");
+      } else {
+        navigate("/profile-setup");
+      }
+    }
+  };
+
+  // Main Initializer
+  const initializeAndRedirect = async (user: any) => {
+    setIsLoading(true);
+    setSuccess("Access Granted...");
+
+    // 1. FAST PATH: Check Local Cache First (Optimistic UI)
+    const local = localStorage.getItem("user");
+    let fastPathUser = null;
+    if (local) {
+      try {
+        const parsed = JSON.parse(local);
+        // Security check: Match UID or Guest
+        if (parsed.uid === user.uid || user.uid.startsWith("guest_local_")) {
+          fastPathUser = parsed;
+        }
+      } catch (e) {}
+    }
+
+    // If local data exists, GO IMMEDIATELY!
+    if (fastPathUser && fastPathUser.isSetupComplete) {
+      console.log("⚡ Fast Path: Login from Cache");
+      localStorage.setItem("user", JSON.stringify(fastPathUser)); // Refresh logic here if needed
+      navigate("/dashboard");
+
+      // BACKGROUND SYNC: Update data quietly for next session
+      syncUserData(user, false).catch((err) =>
+        console.error("BG Sync error", err)
+      );
+      return; // STOP EXECUTION to prevent double navigation
+    }
+
+    // 2. SLOW PATH: No local data? Do full sync and then navigate.
+    await syncUserData(user, true);
+  };
+
   const handleGuestAuth = async () => {
     setError(null);
     setIsLoading(true);
@@ -104,105 +203,6 @@ const Onboarding: React.FC = () => {
       };
       initializeAndRedirect(offlineUser as any);
     }
-  };
-
-  // Initialize System & Redirect
-  const initializeAndRedirect = async (user: any) => {
-    setIsLoading(true);
-    setSuccess("Access Granted...");
-
-    // 1. Prepare Base Template
-    let finalUserData = {
-      name:
-        user.displayName || (user.email ? user.email.split("@")[0] : "Guest"),
-      email: user.email || "",
-      uid: user.uid,
-      age: 0,
-      height: 0,
-      weight: 0,
-      gender: "male",
-      goal: "weight-loss",
-      activityLevel: "moderate",
-      isSetupComplete: false,
-      dietaryRestrictions: [],
-      allergies: [],
-      createdAt: new Date().toISOString(),
-    };
-
-    // 1. INSTANT LOAD: Check Local Cache First (Stale-While-Revalidate)
-    const local = localStorage.getItem("user");
-    let fastPathUser = null;
-    if (local) {
-      try {
-        const parsed = JSON.parse(local);
-        // Match UID to ensure security (basic)
-        if (parsed.uid === user.uid || user.uid.startsWith("guest_local_")) {
-          fastPathUser = parsed;
-        }
-      } catch (e) {}
-    }
-
-    // If we have local data, GO NOW!
-    if (fastPathUser && fastPathUser.isSetupComplete) {
-      console.log("⚡ Fast Path: Login from Cache");
-      localStorage.setItem("user", JSON.stringify(fastPathUser)); // Refresh timestamp if needed
-      navigate("/dashboard");
-      // We still continue below to Sync Cloud Data in Background...
-    }
-
-    // 2. Decide Source: Cloud vs Local
-    let isCloudSynced = false;
-    const isOnline = navigator.onLine;
-
-    // Only attempt Cloud Sync if Online AND not a local-only guest
-    if (isOnline && !user.uid.startsWith("guest_local_")) {
-      try {
-        const userDocRef = doc(db, "users", user.uid);
-        const userSnapshot = await getDoc(userDocRef);
-
-        if (userSnapshot.exists()) {
-          // [LOAD] Found in Cloud
-          finalUserData = userSnapshot.data() as any;
-          isCloudSynced = true;
-        } else {
-          // [NEW] Create in Cloud (Non-blocking usually, but we await to ensure correctness)
-          await setDoc(userDocRef, finalUserData);
-          isCloudSynced = true;
-        }
-      } catch (err) {
-        console.warn("Cloud Sync Failed (Falling back to Local):", err);
-      }
-    }
-
-    // 3. Fail-Safe: Load from Local Storage if Cloud missing/failed
-    if (!isCloudSynced) {
-      const local = localStorage.getItem("user");
-      if (local) {
-        try {
-          const parsed = JSON.parse(local);
-          // Logic: If UID matches, OR if we are in Offline Guest Mode (trust local progress)
-          if (parsed.uid === user.uid || user.uid.startsWith("guest_local_")) {
-            // Merge local progress into template
-            // If it's offline guest, we might want to adopt the PREVIOUS local user's data?
-            // For now, adhere to "Session Persistence" rule:
-            if (parsed.uid === user.uid) finalUserData = parsed;
-          }
-        } catch (e) {}
-      }
-    }
-
-    // 4. Update Local Cache (Source of Truth for Dashboard)
-    localStorage.setItem("user", JSON.stringify(finalUserData));
-
-    // 5. Navigate Fast
-    // Small delay to ensure LocalStorage write is stable
-    setTimeout(() => {
-      if (finalUserData.isSetupComplete) {
-        navigate("/dashboard");
-      } else {
-        navigate("/profile-setup");
-      }
-    }, 100);
   };
 
   const handleEmailAuth = async (e: React.FormEvent) => {
