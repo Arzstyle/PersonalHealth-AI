@@ -9,8 +9,11 @@ import {
   CheckCircle,
   Activity,
   Ghost,
+<<<<<<< HEAD
   Weight,
   ArrowRight,
+=======
+>>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
 } from "lucide-react";
 import {
   getAuth,
@@ -21,8 +24,11 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   signInAnonymously,
+<<<<<<< HEAD
   getAdditionalUserInfo,
   User,
+=======
+>>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
 } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
@@ -69,6 +75,7 @@ const GoogleIcon = () => (
   </svg>
 );
 
+<<<<<<< HEAD
 // --- New Popup Component ---
 interface ReturningUserPopupProps {
   onContinue: () => void;
@@ -119,6 +126,8 @@ const ReturningUserPopup: React.FC<ReturningUserPopupProps> = ({
   </div>
 );
 
+=======
+>>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
 const Onboarding: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useUI();
@@ -137,10 +146,13 @@ const Onboarding: React.FC = () => {
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState<any>(null);
 
+<<<<<<< HEAD
   // New state for handling returning users
   const [showReturningUserPopup, setShowReturningUserPopup] = useState(false);
   const [pendingUser, setPendingUser] = useState<User | null>(null);
 
+=======
+>>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
   const syncUserData = async (user: any, shouldNavigate = true) => {
     let finalUserData = {
       name:
@@ -280,19 +292,27 @@ const Onboarding: React.FC = () => {
           email,
           password
         );
+<<<<<<< HEAD
         // New users go through standard flow
         await initializeAndRedirect(userCredential.user);
+=======
+>>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
       } else {
         userCredential = await signInWithEmailAndPassword(
           auth,
           email,
           password
         );
+<<<<<<< HEAD
         // Existing users get intercepted
         setPendingUser(userCredential.user);
         setShowReturningUserPopup(true);
         setIsLoading(false); 
       }
+=======
+      }
+      await initializeAndRedirect(userCredential.user);
+>>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
     } catch (err: any) {
       setError(err.message || t("auth.error.generic"));
       setIsLoading(false);
@@ -337,6 +357,7 @@ const Onboarding: React.FC = () => {
     setIsLoading(true);
     try {
       const result = await confirmationResult.confirm(otp);
+<<<<<<< HEAD
       // For phone auth simplify to standard flow for now, or intercept if additionalUserInfo check
       const additionalInfo = getAdditionalUserInfo(result);
       if (additionalInfo?.isNewUser) {
@@ -346,6 +367,9 @@ const Onboarding: React.FC = () => {
         setShowReturningUserPopup(true);
         setIsLoading(false);
       }
+=======
+      await initializeAndRedirect(result.user);
+>>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
     } catch (err: any) {
       setError("Invalid OTP Code.");
       setIsLoading(false);
@@ -358,6 +382,7 @@ const Onboarding: React.FC = () => {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
+<<<<<<< HEAD
       const additionalInfo = getAdditionalUserInfo(result);
 
       if (additionalInfo?.isNewUser) {
@@ -368,12 +393,16 @@ const Onboarding: React.FC = () => {
         setShowReturningUserPopup(true);
         setIsLoading(false);
       }
+=======
+      await initializeAndRedirect(result.user);
+>>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
     } catch (err: any) {
       setError(err.message || "Google Auth Failed");
       setIsLoading(false);
     }
   };
 
+<<<<<<< HEAD
   // Popup Actions
   const handleResetMetrics = async () => {
     if (!pendingUser) return;
@@ -417,6 +446,8 @@ const Onboarding: React.FC = () => {
     await initializeAndRedirect(pendingUser);
   };
 
+=======
+>>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
   const inputClasses =
     "w-full p-3 rounded-xl text-sm transition-all outline-none border font-sans font-bold " +
     "bg-white dark:bg-black/40 " +
@@ -434,6 +465,7 @@ const Onboarding: React.FC = () => {
     <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden font-sans text-gray-900 dark:text-gray-100 bg-[#f8fafc] dark:bg-[#050b14] transition-colors duration-500">
       <AdaptiveBackground />
       <div id="recaptcha-container"></div>
+<<<<<<< HEAD
       
       {showReturningUserPopup && (
         <ReturningUserPopup 
@@ -441,6 +473,8 @@ const Onboarding: React.FC = () => {
           onReset={handleResetMetrics}
         />
       )}
+=======
+>>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
 
       <div className="relative z-10 w-full max-w-md p-4 animate-fade-in">
         <div className="bg-white/80 dark:bg-[#0a0f1e]/85 backdrop-blur-xl border border-white/60 dark:border-white/10 rounded-[2rem] overflow-hidden relative shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_rgba(0,0,0,0.6)] transition-all duration-300">
