@@ -9,10 +9,7 @@ import {
 } from "lucide-react";
 import { generateAIContent } from "../services/ai";
 import { useUI } from "../context/UIContext";
-<<<<<<< HEAD
 import nutritionData from "../data/nutrition.json";
-=======
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
 
 interface FoodDetail {
   name: string;
@@ -103,7 +100,6 @@ const AISearch: React.FC<FoodSearchProps> = ({ onSelectFood }) => {
     setSearchResults([]);
 
     try {
-<<<<<<< HEAD
       // 1. Local Search First
       const queryLower = searchQuery.toLowerCase();
       const localMatches = nutritionData.filter((item) =>
@@ -130,8 +126,6 @@ const AISearch: React.FC<FoodSearchProps> = ({ onSelectFood }) => {
       }
 
       // 2. AI Fallback if no local data found
-=======
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
       const prompt = `
         You are an expert AI Nutritionist.
         Identify the food item: "${searchQuery}" and provide a detailed nutritional breakdown.
@@ -166,7 +160,6 @@ const AISearch: React.FC<FoodSearchProps> = ({ onSelectFood }) => {
       setSearchResults(foods);
     } catch (err: any) {
       console.error("Error during AI search:", err);
-<<<<<<< HEAD
       // Detailed error handling for AI failure
       const errorMessage = err?.message || "Unknown error";
 
@@ -177,9 +170,6 @@ const AISearch: React.FC<FoodSearchProps> = ({ onSelectFood }) => {
       } else {
         setError(`Search Failed: ${err.message || "Network Error"}`);
       }
-=======
-      setError(`Scan Failed: ${err.message || "Network Error"}`);
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
     } finally {
       setIsLoading(false);
     }

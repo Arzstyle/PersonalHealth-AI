@@ -327,7 +327,6 @@ const MealPlanning: React.FC = () => {
           })),
         });
       } else {
-<<<<<<< HEAD
         alert("Gagal membuat rencana makan. (AI did not return data)");
       }
     } catch (error: any) {
@@ -341,13 +340,6 @@ const MealPlanning: React.FC = () => {
       } else {
         alert(`AI Generation Gagal: ${errorMessage}`);
       }
-=======
-        alert("Gagal membuat rencana makan. Silakan coba lagi.");
-      }
-    } catch (error: any) {
-      console.error("AI Generation Failed:", error);
-      alert("AI Generation Failed. Please try again.");
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
     } finally {
       setIsGenerating(false);
     }
@@ -672,18 +664,10 @@ const MealPlanning: React.FC = () => {
                   <button
                     key={goal}
                     onClick={() => setDietGoal(goal)}
-<<<<<<< HEAD
                     className={`px-3 py-2 rounded-lg text-xs font-bold transition-all duration-200 btn-press ${dietGoal === goal
-                        ? "bg-emerald-600 text-white shadow-md shadow-emerald-500/20"
-                        : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10"
+                      ? "bg-emerald-600 text-white shadow-md shadow-emerald-500/20"
+                      : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10"
                       }`}
-=======
-                    className={`px-3 py-2 rounded-lg text-xs font-bold transition-all duration-200 btn-press ${
-                      dietGoal === goal
-                        ? "bg-emerald-600 text-white shadow-md shadow-emerald-500/20"
-                        : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10"
-                    }`}
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
                   >
                     {t(`goal.${goal}`)}
                   </button>
@@ -699,16 +683,10 @@ const MealPlanning: React.FC = () => {
             >
               <div
                 className={`absolute inset-0 transition-opacity duration-500
-<<<<<<< HEAD
                   ${isGenerating
                     ? "bg-orange-500"
                     : "bg-cyan-500 opacity-0 group-hover:opacity-100"
-=======
-                  ${
-                    isGenerating
-                      ? "bg-orange-500"
-                      : "bg-cyan-500 opacity-0 group-hover:opacity-100"
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
+                  }
                   }`}
               ></div>
 
@@ -731,7 +709,6 @@ const MealPlanning: React.FC = () => {
                     <div className="relative w-16 h-16 flex items-center justify-center">
                       <div
                         className={`absolute inset-0 border-2 rounded-full border-dashed transition-colors duration-500
-<<<<<<< HEAD
                         ${isGenerating
                             ? "border-orange-500/60 animate-[spin_1s_linear_infinite]"
                             : "border-cyan-500/40 animate-[spin_10s_linear_infinite]"
@@ -743,21 +720,6 @@ const MealPlanning: React.FC = () => {
                             ? "border-red-500/60 animate-[spin_1.5s_linear_infinite_reverse]"
                             : "border-blue-500/40 animate-[spin_15s_linear_infinite_reverse]"
                           }`}
-=======
-                        ${
-                          isGenerating
-                            ? "border-orange-500/60 animate-[spin_1s_linear_infinite]"
-                            : "border-cyan-500/40 animate-[spin_10s_linear_infinite]"
-                        }`}
-                      ></div>
-                      <div
-                        className={`absolute inset-1 border-2 rounded-full border-dotted transition-colors duration-500
-                        ${
-                          isGenerating
-                            ? "border-red-500/60 animate-[spin_1.5s_linear_infinite_reverse]"
-                            : "border-blue-500/40 animate-[spin_15s_linear_infinite_reverse]"
-                        }`}
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
                       ></div>
                       <div className="relative z-10">
                         {isGenerating ? (
@@ -770,18 +732,10 @@ const MealPlanning: React.FC = () => {
 
                     <div
                       className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border transition-colors duration-500 flex items-center gap-2
-<<<<<<< HEAD
                       ${isGenerating
                           ? "bg-orange-100 text-orange-600 border-orange-200 dark:bg-orange-950/80 dark:text-orange-300 dark:border-orange-500/50"
                           : "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/50 dark:text-cyan-300 dark:border-cyan-500/30"
                         }`}
-=======
-                      ${
-                        isGenerating
-                          ? "bg-orange-100 text-orange-600 border-orange-200 dark:bg-orange-950/80 dark:text-orange-300 dark:border-orange-500/50"
-                          : "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/50 dark:text-cyan-300 dark:border-cyan-500/30"
-                      }`}
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
                     >
                       {isGenerating ? "PROCESSING" : "AI READY"}
                     </div>
@@ -790,18 +744,10 @@ const MealPlanning: React.FC = () => {
                   <div className="mt-8">
                     <h3
                       className={`text-xl font-black tracking-tight transition-colors duration-300
-<<<<<<< HEAD
                       ${isGenerating
                           ? "text-orange-600 dark:text-orange-400"
                           : "text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-100"
                         }`}
-=======
-                      ${
-                        isGenerating
-                          ? "text-orange-600 dark:text-orange-400"
-                          : "text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-100"
-                      }`}
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
                     >
                       {isGenerating
                         ? "INITIALIZING AI CORE..."
@@ -811,11 +757,7 @@ const MealPlanning: React.FC = () => {
                       {isGenerating
                         ? "Optimizing macro-nutrient protocols."
                         : t("meal.ai_desc") ||
-<<<<<<< HEAD
                         "Biarkan AI menyusun menu harian lengkap untukmu."}
-=======
-                          "Biarkan AI menyusun menu harian lengkap untukmu."}
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
                     </p>
                   </div>
                 </div>
@@ -904,36 +846,20 @@ const MealPlanning: React.FC = () => {
                       return (
                         <div
                           key={food.id}
-<<<<<<< HEAD
                           className={`relative p-4 flex items-center justify-between group rounded-xl transition-transform duration-200 shadow-sm border border-transparent hover:scale-[1.01] hover:border-emerald-200 dark:hover:border-emerald-500/20 overflow-hidden ${food.completed
-                              ? "bg-emerald-50 dark:bg-emerald-900/20 opacity-80"
-                              : "bg-white dark:bg-slate-800 border-slate-100 dark:border-transparent hover:shadow-lg"
+                            ? "bg-emerald-50 dark:bg-emerald-900/20 opacity-80"
+                            : "bg-white dark:bg-slate-800 border-slate-100 dark:border-transparent hover:shadow-lg"
                             } transform-gpu`}
-=======
-                          className={`relative p-4 flex items-center justify-between group rounded-xl transition-transform duration-200 shadow-sm border border-transparent hover:scale-[1.01] hover:border-emerald-200 dark:hover:border-emerald-500/20 overflow-hidden ${
-                            food.completed
-                              ? "bg-emerald-50 dark:bg-emerald-900/20 opacity-80"
-                              : "bg-white dark:bg-slate-800 border-slate-100 dark:border-transparent hover:shadow-lg"
-                          } transform-gpu`}
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
                         >
                           <div className="flex items-center gap-4 relative z-10">
                             <button
                               onClick={() =>
                                 toggleMealCompletion(mealType, food.id)
                               }
-<<<<<<< HEAD
                               className={`p-1 rounded-full text-current transition-colors btn-press ${food.completed
-                                  ? "text-emerald-600"
-                                  : "text-slate-300 dark:text-slate-600 hover:text-emerald-500"
+                                ? "text-emerald-600"
+                                : "text-slate-300 dark:text-slate-600 hover:text-emerald-500"
                                 }`}
-=======
-                              className={`p-1 rounded-full text-current transition-colors btn-press ${
-                                food.completed
-                                  ? "text-emerald-600"
-                                  : "text-slate-300 dark:text-slate-600 hover:text-emerald-500"
-                              }`}
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
                             >
                               {food.completed ? (
                                 <CheckCircle className="w-6 h-6 fill-emerald-100 dark:fill-emerald-900/50" />
@@ -943,43 +869,22 @@ const MealPlanning: React.FC = () => {
                             </button>
 
                             <div
-<<<<<<< HEAD
                               className={`w-12 h-12 flex items-center justify-center rounded-2xl shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 ${food.completed
-                                  ? "grayscale opacity-50 bg-slate-100 dark:bg-slate-700"
-                                  : `${theme.bg} border ${theme.border} shadow-lg`
+                                ? "grayscale opacity-50 bg-slate-100 dark:bg-slate-700"
+                                : `${theme.bg} border ${theme.border} shadow-lg`
                                 }`}
                             >
                               <FoodIcon
                                 className={`w-6 h-6 ${food.completed ? "text-slate-500" : theme.text
                                   }`}
-=======
-                              className={`w-12 h-12 flex items-center justify-center rounded-2xl shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 ${
-                                food.completed
-                                  ? "grayscale opacity-50 bg-slate-100 dark:bg-slate-700"
-                                  : `${theme.bg} border ${theme.border} shadow-lg`
-                              }`}
-                            >
-                              <FoodIcon
-                                className={`w-6 h-6 ${
-                                  food.completed ? "text-slate-500" : theme.text
-                                }`}
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
                               />
                             </div>
 
                             <div
-<<<<<<< HEAD
                               className={`${food.completed
-                                  ? "line-through text-slate-400"
-                                  : ""
+                                ? "line-through text-slate-400"
+                                : ""
                                 }`}
-=======
-                              className={`${
-                                food.completed
-                                  ? "line-through text-slate-400"
-                                  : ""
-                              }`}
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
                             >
                               <p className="font-bold text-slate-800 dark:text-white text-sm group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
                                 {food.name}
@@ -990,14 +895,8 @@ const MealPlanning: React.FC = () => {
                                 </p>
                               )}
                               <div
-<<<<<<< HEAD
                                 className={`flex items-center gap-2 mt-1 ${food.completed ? "opacity-50" : ""
                                   }`}
-=======
-                                className={`flex items-center gap-2 mt-1 ${
-                                  food.completed ? "opacity-50" : ""
-                                }`}
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
                               >
                                 <span className="text-xs font-medium text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/30 px-2 py-0.5 rounded text-center min-w-[60px]">
                                   {food.calories} kcal
