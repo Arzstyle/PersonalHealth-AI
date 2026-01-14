@@ -9,11 +9,8 @@ import {
   CheckCircle,
   Activity,
   Ghost,
-<<<<<<< HEAD
   Weight,
   ArrowRight,
-=======
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
 } from "lucide-react";
 import {
   getAuth,
@@ -24,11 +21,8 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   signInAnonymously,
-<<<<<<< HEAD
   getAdditionalUserInfo,
   User,
-=======
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
 } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
@@ -75,7 +69,6 @@ const GoogleIcon = () => (
   </svg>
 );
 
-<<<<<<< HEAD
 // --- New Popup Component ---
 interface ReturningUserPopupProps {
   onContinue: () => void;
@@ -113,7 +106,7 @@ const ReturningUserPopup: React.FC<ReturningUserPopupProps> = ({
             <span>Atur Berat Badan Baru</span>
             <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
           </button>
-          
+
           <button
             onClick={onContinue}
             className="w-full py-4 bg-transparent border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 text-gray-600 dark:text-gray-300 font-bold rounded-xl transition-all text-sm uppercase tracking-wider"
@@ -126,8 +119,6 @@ const ReturningUserPopup: React.FC<ReturningUserPopupProps> = ({
   </div>
 );
 
-=======
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
 const Onboarding: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useUI();
@@ -146,13 +137,10 @@ const Onboarding: React.FC = () => {
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState<any>(null);
 
-<<<<<<< HEAD
   // New state for handling returning users
   const [showReturningUserPopup, setShowReturningUserPopup] = useState(false);
   const [pendingUser, setPendingUser] = useState<User | null>(null);
 
-=======
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
   const syncUserData = async (user: any, shouldNavigate = true) => {
     let finalUserData = {
       name:
@@ -196,7 +184,7 @@ const Onboarding: React.FC = () => {
         try {
           const parsed = JSON.parse(local);
           if (parsed.uid === user.uid) finalUserData = parsed;
-        } catch (e) {}
+        } catch (e) { }
       }
     }
 
@@ -223,7 +211,7 @@ const Onboarding: React.FC = () => {
         if (parsed.uid === user.uid || user.uid.startsWith("guest_local_")) {
           fastPathUser = parsed;
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     if (fastPathUser && fastPathUser.isSetupComplete) {
@@ -292,27 +280,19 @@ const Onboarding: React.FC = () => {
           email,
           password
         );
-<<<<<<< HEAD
         // New users go through standard flow
         await initializeAndRedirect(userCredential.user);
-=======
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
       } else {
         userCredential = await signInWithEmailAndPassword(
           auth,
           email,
           password
         );
-<<<<<<< HEAD
         // Existing users get intercepted
         setPendingUser(userCredential.user);
         setShowReturningUserPopup(true);
-        setIsLoading(false); 
+        setIsLoading(false);
       }
-=======
-      }
-      await initializeAndRedirect(userCredential.user);
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
     } catch (err: any) {
       setError(err.message || t("auth.error.generic"));
       setIsLoading(false);
@@ -330,7 +310,7 @@ const Onboarding: React.FC = () => {
           "recaptcha-container",
           {
             size: "invisible",
-            callback: () => {},
+            callback: () => { },
           }
         );
       }
@@ -357,7 +337,6 @@ const Onboarding: React.FC = () => {
     setIsLoading(true);
     try {
       const result = await confirmationResult.confirm(otp);
-<<<<<<< HEAD
       // For phone auth simplify to standard flow for now, or intercept if additionalUserInfo check
       const additionalInfo = getAdditionalUserInfo(result);
       if (additionalInfo?.isNewUser) {
@@ -367,9 +346,6 @@ const Onboarding: React.FC = () => {
         setShowReturningUserPopup(true);
         setIsLoading(false);
       }
-=======
-      await initializeAndRedirect(result.user);
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
     } catch (err: any) {
       setError("Invalid OTP Code.");
       setIsLoading(false);
@@ -382,7 +358,6 @@ const Onboarding: React.FC = () => {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-<<<<<<< HEAD
       const additionalInfo = getAdditionalUserInfo(result);
 
       if (additionalInfo?.isNewUser) {
@@ -393,16 +368,12 @@ const Onboarding: React.FC = () => {
         setShowReturningUserPopup(true);
         setIsLoading(false);
       }
-=======
-      await initializeAndRedirect(result.user);
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
     } catch (err: any) {
       setError(err.message || "Google Auth Failed");
       setIsLoading(false);
     }
   };
 
-<<<<<<< HEAD
   // Popup Actions
   const handleResetMetrics = async () => {
     if (!pendingUser) return;
@@ -410,12 +381,12 @@ const Onboarding: React.FC = () => {
     // Ensure we sync basic data but set isSetupComplete to false so layout doesn't block or redirect strangely?
     // Actually, ProfileSetup doesn't require isSetupComplete=false, check ProtectedRoute logic.
     // ProtectedRoute checks isUserOnboarded() which checks localStorage 'user'.
-    
+
     // So we need to set the user in localStorage first.
     // We can reuse syncUserData logic but force navigation to profile-setup
-    
+
     // We'll mimic syncUserData but explicitly navigate to profile-setup
-    
+
     // Force a "fresh" user state in local storage but keep UID/Email
     const freshUser = {
       name: pendingUser.displayName || (pendingUser.email ? pendingUser.email.split("@")[0] : "Guest"),
@@ -431,12 +402,12 @@ const Onboarding: React.FC = () => {
       isSetupComplete: false, // Important to trigger setup flow
       createdAt: new Date().toISOString(),
     };
-    
+
     localStorage.setItem("user", JSON.stringify(freshUser));
-    
+
     // Also try to update Firestore if possible to reflect reset? 
     // Or just let ProfileSetup overwrite it. ProfileSetup overwrites on finish.
-    
+
     // Navigate
     navigate("/profile-setup");
   };
@@ -446,8 +417,6 @@ const Onboarding: React.FC = () => {
     await initializeAndRedirect(pendingUser);
   };
 
-=======
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
   const inputClasses =
     "w-full p-3 rounded-xl text-sm transition-all outline-none border font-sans font-bold " +
     "bg-white dark:bg-black/40 " +
@@ -465,16 +434,15 @@ const Onboarding: React.FC = () => {
     <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden font-sans text-gray-900 dark:text-gray-100 bg-[#f8fafc] dark:bg-[#050b14] transition-colors duration-500">
       <AdaptiveBackground />
       <div id="recaptcha-container"></div>
-<<<<<<< HEAD
-      
-      {showReturningUserPopup && (
-        <ReturningUserPopup 
-          onContinue={handleContinueDashboard}
-          onReset={handleResetMetrics}
-        />
-      )}
-=======
->>>>>>> 8aaccfdcafabe2d66f1b9f88d0e3b21248ebc6f9
+
+      {
+        showReturningUserPopup && (
+          <ReturningUserPopup
+            onContinue={handleContinueDashboard}
+            onReset={handleResetMetrics}
+          />
+        )
+      }
 
       <div className="relative z-10 w-full max-w-md p-4 animate-fade-in">
         <div className="bg-white/80 dark:bg-[#0a0f1e]/85 backdrop-blur-xl border border-white/60 dark:border-white/10 rounded-[2rem] overflow-hidden relative shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_rgba(0,0,0,0.6)] transition-all duration-300">
@@ -493,17 +461,15 @@ const Onboarding: React.FC = () => {
           <div className="flex border-b border-gray-100 dark:border-gray-800 mx-6">
             <button
               onClick={() => setLoginMethod("email")}
-              className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 rounded-t-lg ${
-                loginMethod === "email" ? tabActiveClasses : tabInactiveClasses
-              }`}
+              className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 rounded-t-lg ${loginMethod === "email" ? tabActiveClasses : tabInactiveClasses
+                }`}
             >
               <Mail className="w-4 h-4" /> {t("auth.method.email")}
             </button>
             <button
               onClick={() => setLoginMethod("phone")}
-              className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 rounded-t-lg ${
-                loginMethod === "phone" ? tabActiveClasses : tabInactiveClasses
-              }`}
+              className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 rounded-t-lg ${loginMethod === "phone" ? tabActiveClasses : tabInactiveClasses
+                }`}
             >
               <Smartphone className="w-4 h-4" /> {t("auth.method.phone")}
             </button>
@@ -697,7 +663,7 @@ const Onboarding: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 
