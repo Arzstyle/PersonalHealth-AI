@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { generateAIContent } from "../services/ai";
 import { useUI } from "../context/UIContext";
+import nutritionData from "../data/nutrition.json";
 
 interface FoodDetail {
   name: string;
@@ -99,6 +100,32 @@ const AISearch: React.FC<FoodSearchProps> = ({ onSelectFood }) => {
     setSearchResults([]);
 
     try {
+      // 1. Local Search First
+      const queryLower = searchQuery.toLowerCase();
+      const localMatches = nutritionData.filter((item) =>
+        item.name.toLowerCase().includes(queryLower)
+      );
+
+      if (localMatches.length > 0) {
+        // Simulate a short network delay for better UX
+        await new Promise((resolve) => setTimeout(resolve, 600));
+
+        const mappedResults: FoodDetail[] = localMatches.map((item) => ({
+          name: item.name,
+          calories: item.calories,
+          protein: item.proteins, // Map proteins -> protein
+          carbs: item.carbohydrate, // Map carbohydrate -> carbs
+          fat: item.fat,
+          servingSize: "100g (Database)", // Default for DB items
+          image: item.image,
+        }));
+
+        setSearchResults(mappedResults);
+        setIsLoading(false);
+        return; // DATA FOUND LOCALLY - STOP HERE
+      }
+
+      // 2. AI Fallback if no local data found
       const prompt = `
         You are an expert AI Nutritionist.
         Identify the food item: "${searchQuery}" and provide a detailed nutritional breakdown.
@@ -133,7 +160,16 @@ const AISearch: React.FC<FoodSearchProps> = ({ onSelectFood }) => {
       setSearchResults(foods);
     } catch (err: any) {
       console.error("Error during AI search:", err);
-      setError(`Scan Failed: ${err.message || "Network Error"}`);
+      // Detailed error handling for AI failure
+      const errorMessage = err?.message || "Unknown error";
+
+      if (errorMessage.includes("401")) {
+        setError("API Key Error (401). Check .env file.");
+      } else if (errorMessage.includes("429")) {
+        setError("Rate Limit (429). Please wait.");
+      } else {
+        setError(`Search Failed: ${err.message || "Network Error"}`);
+      }
     } finally {
       setIsLoading(false);
     }

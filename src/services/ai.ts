@@ -102,7 +102,8 @@ export const generateAIContent = async (
     return { success: true, data: cleanData };
   } catch (error: any) {
     console.error("Groq AI Error:", error);
-    return { success: false, error: error.message || "Unknown error occurred" };
+    // Throw error to be caught by component
+    throw new Error(error?.error?.message || error.message || "Unknown AI Error");
   }
 };
 
@@ -204,9 +205,8 @@ export const generateExercisePlanAI = async (
 
     **Strict Scientific Requirements:**
     1. **Personalization**: 
-       - Adjust volume (Sets x Reps) specifically for a ${
-         userData?.age || "adult"
-       } year old ${userData?.gender || "person"}.
+       - Adjust volume (Sets x Reps) specifically for a ${userData?.age || "adult"
+    } year old ${userData?.gender || "person"}.
        - If user is overweight (high BMI), prioritize low-impact joint-friendly movements.
        - If Goal is 'Muscle Gain', focus on Hypertrophy ranges (8-12 reps).
        - If Goal is 'Weight Loss', focus on Metabolic Conditioning (high reps / timed intervals).
